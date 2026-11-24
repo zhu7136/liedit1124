@@ -1,5 +1,17 @@
 # HU_D04 No-State-Estimation / toe-parallel plus20s — one bounded trial
 
+## Superseding authorization 2026-11-24T08:40:48Z:60-minute replacement
+
+The user requested cancellation of the queued30-minute taskTASK_20261124_294
+and ONE new60-minute fresh training trial. The cancelled task never started.
+This branch changes ONLY the worker budget/run name from the prior No-State
+delivery:3600s worker maximum including startup/save/export,3420s PPO soft stop,
+3540s child cutoff;420s startup watchdog unchanged. Same one4090D24GB,4096envs,
+seed42,154actor inputs29actions,25s episodes and1187-frame plus20s reference.
+No auto retries, checkpoint warm start, extra GPU or environment fallback.
+Native Flux output storage only. Old tasks/checkpoints/main stay unchanged.
+The historical30-minute/187-frame notes below do not describe this new budget.
+
 ## Current authorization 2026-11-24T08:28:28Z
 
 - One fresh trial on one4090D24GB,4096 environments; no checkpoint input.

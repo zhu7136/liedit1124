@@ -1,12 +1,14 @@
 # HU_D04 toe-down, parallel-shin candidate — bounded training delivery
 
 User-authorized public delivery of the necessary source, robot USD and motion.
-This isolated branch has independent history. It does not modify main or reuse
+This branch builds on the isolated 64-environment delivery. It does not modify main or reuse
 the old low-climb experiments, G1 limits, weights, rewards or datasets.
 
 ## Scope
 
-- Flux project HuD04_WBT, one 4090D24GB, 64 environments, fresh PPO, seed42.
+- Flux project HuD04_WBT, one 4090D24GB, 4096 environments, fresh PPO, seed42.
+- Replaces the user-stopped 64-environment task; its checkpoints are retained,
+  but are NOT loaded here. GPU OOM stops this attempt with no environment fallback.
 - Worker budget1800s **including setup/save**; PPO soft stop1620s from entry;
   child cutoff1740s; startup watchdog420s; zero automatic retries/restarts.
 - No20-update short cap:100000-iteration safety ceiling plus time deadlines.

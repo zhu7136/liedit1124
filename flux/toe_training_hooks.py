@@ -7,6 +7,11 @@ OUT=ROOT/'outputs/toe_training'
 SOFT_DEADLINE=float(os.environ.get('TOE_SOFT_DEADLINE','0'))
 SHA='68e6d580354a86caeed1b94e7869475fb3220c1fa4dc95894057301aed62fb35'
 
+def cuda_snapshot(stage):
+    import torch
+    free,total=torch.cuda.mem_get_info(0)
+    event('cuda_memory',stage=stage,free_bytes=free,total_bytes=total,allocated_bytes=torch.cuda.memory_allocated(0),reserved_bytes=torch.cuda.memory_reserved(0))
+
 def event(name,**kw):
     row={'event':name,'elapsed_seconds':round(time.monotonic()-float(os.environ.get('TOE_WORKER_STARTED',str(time.monotonic()))),3),**kw}
     OUT.mkdir(parents=True,exist_ok=True)
@@ -24,10 +29,11 @@ def audit_environment(env):
     _,joint_names=robot.find_joints(cfg.joint_names,preserve_order=True)
     if joint_names!=manifest['joint_names']:
         raise RuntimeError('Motion joint ordering differs from expected 29-joint ordering')
-    if raw.num_envs!=64: raise RuntimeError('Refusing environment count other than approved 64')
+    if raw.num_envs!=4096: raise RuntimeError('Refusing environment count other than approved 4096')
     motion=Path(cfg.motion_file)
     if hashlib.sha256(motion.read_bytes()).hexdigest()!=SHA:raise RuntimeError('Motion input hash changed')
     event('environment_constructed',num_envs=raw.num_envs,tracked_bodies=len(names),motion_sha256=SHA,joint_count=len(joint_names),body_order_verified=True)
+    cuda_snapshot('environment_constructed')
 
 class BudgetReached(Exception):pass
 
@@ -35,10 +41,12 @@ def run_bounded_training(runner,iterations,env):
     import torch
     if SOFT_DEADLINE<=time.monotonic()+10:raise RuntimeError('Insufficient remaining worker budget for training')
     original=runner.log;updates=0;start=time.monotonic()
+    if runner.current_learning_iteration!=0:raise RuntimeError('Approved fresh training must start at iteration zero')
     def bounded_log(locs,*args,**kwargs):
         nonlocal updates
         original(locs,*args,**kwargs)
         updates+=1
+        if updates==1:cuda_snapshot('first_ppo_update')
         metrics={'iteration':int(locs['it']),'completed_updates':updates,'training_seconds':round(time.monotonic()-start,3)}
         for key,value in locs.get('loss_dict',{}).items():
             v=float(value)
@@ -72,7 +80,7 @@ def run_bounded_training(runner,iterations,env):
     if runner.writer is not None:
         runner.writer.flush()
         runner.writer.close()
-    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':SHA,'checkpoint_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),'checkpoint_bytes':destination.stat().st_size,'num_envs':64,'dynamics_validated':False,'hardware_approved':False}
+    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':SHA,'checkpoint_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),'checkpoint_bytes':destination.stat().st_size,'num_envs':4096,'fresh_training':True,'dynamics_validated':False,'hardware_approved':False}
     if record['checkpoint_bytes']<10000:raise RuntimeError('Empty final checkpoint')
     (OUT/'completion.json').write_text(json.dumps(record,indent=2,allow_nan=False))
     event('checkpoint_saved',**record)

@@ -62,7 +62,7 @@ def worker(started):
                 sys.path[:0]=[str(base/pkg) for pkg in ['isaaclab','isaaclab_assets','isaaclab_tasks','isaaclab_rl']]
                 break
     verify_inputs();prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic','--motion_file',str(ROOT/'motions/gui00528900_toe_vertical_parallel_candidate/motion.npz'),'--num_envs','64','--max_iterations','100000','--seed','42','--run_name','toe_vertical_parallel_30min','--logger','tensorboard','--headless','--device','cuda:0']
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic','--motion_file',str(ROOT/'motions/gui00528900_toe_vertical_parallel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--run_name','toe_vertical_parallel_4096_30min','--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 
 def seal_and_upload(delivery,child_code,reason):
@@ -108,7 +108,7 @@ def main():
         if launcher is None:
             if sys.version_info[:2]!=(3,11):raise RuntimeError('No documented IsaacSim Python launcher found')
             launcher=sys.executable
-        event('worker_begin',commit=actual,worker_limit_seconds=WORKER_SECONDS,soft_stop_seconds=SOFT_SECONDS,startup_limit_seconds=STARTUP_SECONDS,num_envs=64,automatic_retries=0)
+        event('worker_begin',commit=actual,worker_limit_seconds=WORKER_SECONDS,soft_stop_seconds=SOFT_SECONDS,startup_limit_seconds=STARTUP_SECONDS,num_envs=4096,automatic_retries=0,fresh_training=True)
         child_log=OUT/'native.log'
         env=dict(os.environ,PYTHONUNBUFFERED='1',CUDA_VISIBLE_DEVICES='0')
         with child_log.open('w') as log:
@@ -117,6 +117,13 @@ def main():
             while child.poll() is None:
                 elapsed=time.monotonic()-started
                 if elapsed>=CHILD_SECONDS:reason='child_hard_deadline';break
+                native_tail=child_log.open('rb')
+                with native_tail:
+                    native_tail.seek(0,2);size=native_tail.tell();native_tail.seek(max(0,size-65536))
+                    native_text=native_tail.read().decode(errors='replace').lower()
+                if any(marker in native_text for marker in ['out of memory','outofmemoryerror','cuda_error_out_of_memory','failed to allocate gpu memory','gpu memory allocation failed']):
+                    event('gpu_memory_failure_detected',automatic_retries=0,environment_fallback=False)
+                    reason='gpu_memory_failure';break
                 event_file=OUT/'events.jsonl'
                 initialized=False
                 if event_file.exists():

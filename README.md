@@ -1,4 +1,25 @@
-# HU_D04 toe-down, parallel-shin candidate — bounded training delivery
+# HU_D04 No-State-Estimation / toe-parallel plus20s — one bounded trial
+
+## Current authorization 2026-11-24T08:28:28Z
+
+- One fresh trial on one4090D24GB,4096 environments; no checkpoint input.
+- Task LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation:154actor inputs,
+  29actions. Critic retains its privileged observations during training only.
+- Current input is motions/gui00528900_toe_vertical_parallel_plus20s/motion.npz,
+  1187frames50FPS, SHA256
+  3d4bd08212cd96509af9ca46d4f9554b53004a3446dd4c64159c7555842c5fda.
+- Episode limit25s, reference random-start sampling retained. Rewards, physics
+  and failure criteria unchanged. No knee-contact validation requirement added.
+-1800s WORKER limit includes initialization/save/export, PPO softstop1620s,
+  child cutoff1740s, startup watchdog420s, no retry/OOM fallback/extra GPU.
+- Native Flux output storage only; no general credentials sent to worker.
+- Outputs: final_checkpoint.pt, policy.pt (TorchScript), policy.onnx,
+  deploy.yaml, metrics/events, configs. Fresh training uses isolated log name.
+- Export shape and metadata checks do NOT establish stable tracking, safe
+  walk-to-mimic transition or hardware readiness. Simulation only.
+
+The original delivery notes below describe the prior187-frame baseline only;
+the current authorization and runtime checks above supersede that input/scope.
 
 User-authorized public delivery of the necessary source, robot USD and motion.
 This branch builds on the isolated 64-environment delivery. It does not modify main or reuse

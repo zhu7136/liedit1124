@@ -1,11 +1,11 @@
 """Budget and provenance instrumentation; no reward/dynamics modifications."""
-import hashlib,json,math,os,time
+import hashlib,json,math,os,time,shutil
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'outputs/toe_training'
 SOFT_DEADLINE=float(os.environ.get('TOE_SOFT_DEADLINE','0'))
-SHA='68e6d580354a86caeed1b94e7869475fb3220c1fa4dc95894057301aed62fb35'
+SHA='3d4bd08212cd96509af9ca46d4f9554b53004a3446dd4c64159c7555842c5fda'
 
 def cuda_snapshot(stage):
     import torch
@@ -30,9 +30,18 @@ def audit_environment(env):
     if joint_names!=manifest['joint_names']:
         raise RuntimeError('Motion joint ordering differs from expected 29-joint ordering')
     if raw.num_envs!=4096: raise RuntimeError('Refusing environment count other than approved 4096')
+    expected_terms=['command','motion_anchor_ori_b','base_ang_vel','joint_pos','joint_vel','actions']
+    if list(raw.observation_manager.active_terms['policy'])!=expected_terms:
+        raise RuntimeError('Policy observations must match No-State-Estimation gamepad interface')
+    if tuple(raw.observation_manager.group_obs_dim['policy'])!=(154,):
+        raise RuntimeError('Actor must have exactly154 observation values')
+    if raw.action_manager.total_action_dim!=29:
+        raise RuntimeError('Policy must output29 controlled-joint actions')
+    if raw.cfg.episode_length_s!=25.0:
+        raise RuntimeError('Long reference requires the approved25s episode configuration')
     motion=Path(cfg.motion_file)
     if hashlib.sha256(motion.read_bytes()).hexdigest()!=SHA:raise RuntimeError('Motion input hash changed')
-    event('environment_constructed',num_envs=raw.num_envs,tracked_bodies=len(names),motion_sha256=SHA,joint_count=len(joint_names),body_order_verified=True)
+    event('environment_constructed',num_envs=raw.num_envs,tracked_bodies=len(names),motion_sha256=SHA,joint_count=len(joint_names),body_order_verified=True,actor_obs_dim=154,action_dim=29,episode_length_s=25.0)
     cuda_snapshot('environment_constructed')
 
 class BudgetReached(Exception):pass
@@ -77,10 +86,35 @@ def run_bounded_training(runner,iterations,env):
     if updates<1:raise RuntimeError('No completed PPO updates')
     destination=OUT/'final_checkpoint.pt'
     runner.save(str(destination))
+    export_deployment(runner)
     if runner.writer is not None:
         runner.writer.flush()
         runner.writer.close()
-    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':SHA,'checkpoint_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),'checkpoint_bytes':destination.stat().st_size,'num_envs':4096,'fresh_training':True,'dynamics_validated':False,'hardware_approved':False}
+    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':SHA,'checkpoint_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),'checkpoint_bytes':destination.stat().st_size,'num_envs':4096,'fresh_training':True,'actor_obs_dim':154,'action_dim':29,'episode_length_s':25.0,'dynamics_validated':False,'hardware_approved':False}
     if record['checkpoint_bytes']<10000:raise RuntimeError('Empty final checkpoint')
     (OUT/'completion.json').write_text(json.dumps(record,indent=2,allow_nan=False))
     event('checkpoint_saved',**record)
+
+def export_deployment(runner):
+    import torch
+    import yaml
+    from isaaclab_rl.rsl_rl import export_policy_as_jit,export_policy_as_onnx
+    policy=runner.alg.policy
+    normalizer=getattr(policy,'actor_obs_normalizer',None)
+    export_policy_as_jit(policy,normalizer=normalizer,path=str(OUT),filename='policy.pt')
+    export_policy_as_onnx(policy,normalizer=normalizer,path=str(OUT),filename='policy.onnx')
+    source=Path(runner.log_dir)/'params/deploy.yaml'
+    cfg=yaml.safe_load(source.read_text())
+    if sum(len(v['scale']) for v in cfg['observations'].values())!=154:
+        raise RuntimeError('Deployment observation metadata does not match154 inputs')
+    if len(cfg['actions']['joint_pos']['joint_names'])!=29:
+        raise RuntimeError('Deployment action metadata does not match29 joints')
+    shutil.copy2(source,OUT/'deploy.yaml')
+    saved=torch.jit.load(str(OUT/'policy.pt'),map_location='cpu').eval()
+    with torch.inference_mode():
+        result=saved(torch.zeros(1,154))
+    if tuple(result.shape)!=(1,29) or not torch.isfinite(result).all():
+        raise RuntimeError('Exported TorchScript policy failed154->29 CPU smoke test')
+    for name in ['policy.pt','policy.onnx','deploy.yaml']:
+        p=OUT/name
+        event('deployment_file_saved',name=name,bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest())

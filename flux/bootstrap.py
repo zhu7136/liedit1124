@@ -52,7 +52,7 @@ def prepare_dependencies():
     x=torch.ones(16,device='cuda:0');assert (x+x).sum().item()==32;torch.cuda.synchronize()
     event('runtime_preflight_verified',python=sys.version.split()[0],torch=torch.__version__,cuda=torch.version.cuda,rsl_rl='3.1.2',offline_installed=len(wheels))
 
-def worker(started):
+def worker(started,resume_mount):
     os.environ.update(TOE_WORKER_STARTED=str(started),TOE_SOFT_DEADLINE=str(started+SOFT_SECONDS),CUDA_VISIBLE_DEVICES='0',PYTHONUNBUFFERED='1',WANDB_MODE='disabled',OMNI_KIT_ACCEPT_EULA='YES',ACCEPT_EULA='Y')
     sys.path[:0]=[str(ROOT/'source/limx_rl_lab'),str(ROOT/'flux'),str(ROOT/'scripts/rsl_rl')]
     # Discover only documented IsaacLab source installation directories.
@@ -61,11 +61,18 @@ def worker(started):
             if (base/'isaaclab/isaaclab').is_dir():
                 sys.path[:0]=[str(base/pkg) for pkg in ['isaaclab','isaaclab_assets','isaaclab_tasks','isaaclab_rl']]
                 break
-    verify_inputs();prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic','--motion_file',str(ROOT/'motions/gui00528900_toe_vertical_parallel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--run_name','toe_vertical_parallel_4096_30min','--logger','tensorboard','--headless','--device','cuda:0']
+    verify_inputs()
+    mount=Path(resume_mount)
+    candidates=[mount] if mount.is_file() else list(mount.rglob('*.pt')) if mount.is_dir() else []
+    if len(candidates)!=1 or hashlib.sha256(candidates[0].read_bytes()).hexdigest()!='84946a9c531e60b38a926874506c855fe95747a955f63cb1ac2b3c1f19a969a5':
+        raise RuntimeError('Missing, ambiguous, or changed Flux checkpoint; no fresh fallback')
+    resume_path=candidates[0].resolve()
+    event('resume_input_verified',checkpoint_sha256=hashlib.sha256(resume_path.read_bytes()).hexdigest(),checkpoint_bytes=resume_path.stat().st_size,parent_task_id='TASK_20261124_187')
+    prepare_dependencies();os.chdir(ROOT)
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic','--resume','--checkpoint',str(resume_path),'--motion_file',str(ROOT/'motions/gui00528900_toe_vertical_parallel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--run_name','toe_vertical_parallel_4096_resume_30min','--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 
-def seal_and_upload(delivery,child_code,reason):
+def seal_and_archive(child_code,reason):
     record={'child_exit_code':child_code,'parent_stop_reason':reason,'worker_seconds':WORKER_SECONDS,'automatic_retries':0,'completion_present':(OUT/'completion.json').is_file()}
     (OUT/'parent_result.json').write_text(json.dumps(record,indent=2))
     files=[p for p in OUT.rglob('*') if p.is_file()]
@@ -74,45 +81,35 @@ def seal_and_upload(delivery,child_code,reason):
     target=ROOT/'outputs/toe-training-output.zip'
     with zipfile.ZipFile(target,'w',zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(set(files)):archive.write(path,str(path.relative_to(ROOT)))
-    url=delivery['url'];headers=delivery.get('headers',{})
-    parsed=urllib.parse.urlsplit(url)
-    if parsed.scheme!='https' or parsed.username or parsed.password or not (parsed.hostname=='storage.googleapis.com' or str(parsed.hostname).endswith('.storage.googleapis.com')):raise RuntimeError('Only one-file scoped GCS PUT allowed')
-    if any(k.lower()!='content-type' and not k.lower().startswith('x-goog-') for k in headers):raise RuntimeError('Unapproved upload header')
-    class NoRedirect(urllib.request.HTTPRedirectHandler):
-        def redirect_request(self,*a,**kw):return None
-    req=urllib.request.Request(url,data=target.read_bytes(),headers=headers,method='PUT')
-    with urllib.request.build_opener(NoRedirect()).open(req,timeout=30) as response:
-        if response.status not in [200,201]:raise RuntimeError('Output PUT failed')
-    event('output_uploaded',bytes=target.stat().st_size,sha256=hashlib.sha256(target.read_bytes()).hexdigest(),**record)
+    event('output_ready_for_flux_archive',bytes=target.stat().st_size,sha256=hashlib.sha256(target.read_bytes()).hexdigest(),credential_forwarding=False,**record)
     return child_code==0 and record['completion_present']
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--commit');p.add_argument('--delivery-b64');p.add_argument('--runtime-child',action='store_true');p.add_argument('--started',type=float)
+    p.add_argument('--commit');p.add_argument('--resume-mount',required=True);p.add_argument('--runtime-child',action='store_true');p.add_argument('--started',type=float)
     args=p.parse_args()
     if args.runtime_child:
         if args.started is None:raise RuntimeError('Missing monotonic parent start')
-        worker(args.started);return
+        worker(args.started,args.resume_mount);return
     started=time.monotonic();child=None
     def cutoff(*unused):
         if child is not None and child.poll() is None:os.killpg(child.pid,signal.SIGKILL)
         raise TimeoutError('Worker 1800-second limit reached')
     signal.signal(signal.SIGALRM,cutoff);signal.alarm(WORKER_SECONDS)
     try:
-        if not args.commit or not args.delivery_b64 or OUT.exists():raise RuntimeError('Requires pinned commit, scoped output and fresh directory; no restart')
+        if not args.commit or OUT.exists():raise RuntimeError('Requires pinned commit, resume input and fresh output directory; no restart')
         actual=subprocess.run(['git','-C',str(ROOT),'rev-parse','HEAD'],capture_output=True,text=True,check=True,timeout=10).stdout.strip()
         if actual!=args.commit:raise RuntimeError('Worker checkout commit differs from pinned commit')
-        delivery=json.loads(base64.urlsafe_b64decode(args.delivery_b64).decode())
         OUT.mkdir(parents=True)
         launcher=next((str(x) for x in [Path('/isaac-sim/python.sh'),Path('/workspace/isaaclab/_isaac_sim/python.sh')] if x.is_file() and os.access(x,os.X_OK)),None)
         if launcher is None:
             if sys.version_info[:2]!=(3,11):raise RuntimeError('No documented IsaacSim Python launcher found')
             launcher=sys.executable
-        event('worker_begin',commit=actual,worker_limit_seconds=WORKER_SECONDS,soft_stop_seconds=SOFT_SECONDS,startup_limit_seconds=STARTUP_SECONDS,num_envs=4096,automatic_retries=0,fresh_training=True)
+        event('worker_begin',commit=actual,worker_limit_seconds=WORKER_SECONDS,soft_stop_seconds=SOFT_SECONDS,startup_limit_seconds=STARTUP_SECONDS,num_envs=4096,automatic_retries=0,fresh_training=False,parent_task_id='TASK_20261124_187')
         child_log=OUT/'native.log'
         env=dict(os.environ,PYTHONUNBUFFERED='1',CUDA_VISIBLE_DEVICES='0')
         with child_log.open('w') as log:
-            child=subprocess.Popen([launcher,str(Path(__file__).resolve()),'--runtime-child','--started',str(started)],stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
+            child=subprocess.Popen([launcher,str(Path(__file__).resolve()),'--runtime-child','--started',str(started),'--resume-mount',args.resume_mount],stdout=log,stderr=subprocess.STDOUT,env=env,start_new_session=True)
             reason='child_exited';position=0
             while child.poll() is None:
                 elapsed=time.monotonic()-started
@@ -135,11 +132,15 @@ def main():
             if child.poll() is None:
                 os.killpg(child.pid,signal.SIGKILL);child.wait(timeout=5)
         code=child.returncode
+        event_file=OUT/'events.jsonl'
+        if event_file.exists():
+            text=event_file.read_text()
+            if len(text)>position:print(text[position:],end='',flush=True)
         event('child_exit',code=code,reason=reason)
         if code!=0:
             tail=child_log.read_text(errors='replace')[-12000:]
             print('NATIVE_ERROR_TAIL\n'+tail,flush=True)
-        if not seal_and_upload(delivery,code,reason):raise RuntimeError('Training did not finish with completed updates and final checkpoint')
+        if not seal_and_archive(code,reason):raise RuntimeError('Training did not finish with completed updates and final checkpoint')
     except BaseException as exc:
         event('worker_failed',error_type=type(exc).__name__)
         raise SystemExit(1)

@@ -1,0 +1,127 @@
+{
+  "archive_bytes": 48147083,
+  "archive_sha256": "045f4a075da2588bcd6d0960689af1a6c422c93c9d782353dde94e16c20f76e7",
+  "changed_source_files": [
+    "flux/bootstrap.py"
+  ],
+  "chunks": [
+    {
+      "bytes": 3145728,
+      "file": "source.part-000",
+      "git_blob": "7987c083e57340ef17404b2890725952cdbaf4f1",
+      "index": 0,
+      "sha256": "097d31f8ba5f56c0e6841aa2ec28ec42bafefe39b91c879eb026db1c472569e4"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-001",
+      "git_blob": "c11393be931f8eea9e40a30353d447adb7cdb378",
+      "index": 1,
+      "sha256": "f5fc4e8fc25b20cd9389ca3673fe4df56340cd07d4dee58eebcfd5e14f1d96b6"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-002",
+      "git_blob": "30ef68b83d79fa224e745331eedec28cb2d8f3ff",
+      "index": 2,
+      "sha256": "e7ad774518c5b53c091e3435d05bde027e809c1edd6c46dd540b2289d12095d0"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-003",
+      "git_blob": "d6814e365f9ffe0b76c0082cccec473fb9f8b514",
+      "index": 3,
+      "sha256": "4c333d072e7410247580a44f401a08b326ee95ae7c8c099bb31305e9dfd462e1"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-004",
+      "git_blob": "e5bb1f6a0010420a8c2dda4aef37b3848e7446e2",
+      "index": 4,
+      "sha256": "cffb354861178da41c1c45f4940f392ea5dba5257ef3f12df5f86a43fd81cf18"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-005",
+      "git_blob": "4704ca7f9a5ea18b9b27387826f34e32ca5b5c7c",
+      "index": 5,
+      "sha256": "30549095620079175a78d7726f1a77da9b83ccdb8886bec419aad5605b53c8f6"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-006",
+      "git_blob": "0332e08aa359d252e42da7d3f1304606bccf2a12",
+      "index": 6,
+      "sha256": "0699334d1c3f8db2dd9fd4276b79518a6f91fde493f912f0d07c20654b561d60"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-007",
+      "git_blob": "ed966fef7b059120a0d7ea6a5978ab3de6753ed8",
+      "index": 7,
+      "sha256": "08674c51e350188853805920916c19d58dcd1a1a11899ba262a5a16b1a0fdaed"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-008",
+      "git_blob": "35e92ce33d99e3d5aa77d1880e660c973b61fe3c",
+      "index": 8,
+      "sha256": "6d97abcef575e590722952458b398596376f8ad2d4e25573ec01771cad87ac1b"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-009",
+      "git_blob": "b504854a149d814cbca74454114e945d06b9a2ea",
+      "index": 9,
+      "sha256": "cf03a7d3cf02a0b75c8187ba533df3c09b556b367d160d1422acd4c78fee6a74"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-010",
+      "git_blob": "570838dc4e550414daa2ee85bd65060aba13107c",
+      "index": 10,
+      "sha256": "49d16fbbbc9378951288be24b83afdfa9706663d6636fe345f1bb2ca7d1dd4fd"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-011",
+      "git_blob": "51ad5ec3e93741588c1190a431cfff1d1cca578a",
+      "index": 11,
+      "sha256": "9ab750a0bb0a63e00155fb0dde725389a8a22f8771ace6f12c6d3480a9d31d62"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-012",
+      "git_blob": "91d43ed40b9ef68fafcdc64eb7c3cdf4775a739b",
+      "index": 12,
+      "sha256": "abdef352547d66c1a0220cd10ad77303e763c7f1937f74fd63ed59330af9d000"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-013",
+      "git_blob": "2057922335c4dcd8d7295539f1f2ad6003873b84",
+      "index": 13,
+      "sha256": "91c2c9dcdeb7d3db3953d24d5e581aa00ecb67565458943e161b84608feb09e9"
+    },
+    {
+      "bytes": 3145728,
+      "file": "source.part-014",
+      "git_blob": "e5eaec02d0bc0bb25043c622e2a955ad22602efa",
+      "index": 14,
+      "sha256": "10106b9ae56c568848a6f04809603b6d6872e3576d4d59feea9637bff629c120"
+    },
+    {
+      "bytes": 961163,
+      "file": "source.part-015",
+      "git_blob": "e1aee16ab436a6ad41f8539f59fdd1207bd661f6",
+      "index": 15,
+      "sha256": "0f70ed5dea5e03889fb08f1e85a6dd848090cee3e46d084ee8a5bf137081a0fa"
+    }
+  ],
+  "file_count": 113,
+  "format": "hud04_delivery_v1",
+  "motion_sha256": "d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a",
+  "original_training_commit": "3939756a0018f3dd74e880320e4ee2e9d9ddbbdf",
+  "repo": "zhu7136/liedit1124",
+  "source_manifest_sha256": "c324160ed796427b8511195e39f1480b0daedc364b5af1df9695619441e27d49"
+}

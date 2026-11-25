@@ -1,0 +1,51 @@
+{
+  "status": "KINEMATIC_HOLD_CORRECTION_VALIDATED_NOT_DYNAMICS",
+  "source_name": "motion_1_333_hold.npz",
+  "source_sha256": "c6302553ea3fa923013c0b36618bde25f0bcb5d6da2f58cedb802a8bd4c02393",
+  "output_name": "motion_1_333_hold_upright_center.npz",
+  "output_sha256": "132c760feee8b39f8ca9fd9285e84d89af197bdf4f4a1e7dce42c9ee8a16f798",
+  "frames": 1334,
+  "fps": 50,
+  "duration_s": 26.68,
+  "unchanged_prefix_frames": 234,
+  "transition_start_zero_based": 234,
+  "transition_end_zero_based": 333,
+  "hold_start_zero_based": 334,
+  "hold_frames": 1000,
+  "hold_seconds": 20,
+  "torso_definition": "waist_pitch_link local+Z aligned with world+Z IN HOLD ONLY",
+  "com_definition": "URDF mass-weighted whole-body COM centered laterally between left/right ankle frames; not extra fore-aft centering",
+  "before": {
+    "torso_tilt_deg": 14.248803528065768,
+    "com_lateral_offset_m": -0.01953265796152907,
+    "com_world": [
+      0.1432977321393566,
+      0.3807665838685432,
+      0.5340659502931994
+    ],
+    "feet_position_change_max_m": 0.0,
+    "feet_orientation_change_max_deg": 0.0,
+    "max_joint_change_deg": 0.0
+  },
+  "after": {
+    "torso_tilt_deg": 1.4787793334710982e-06,
+    "com_lateral_offset_m": -6.373534575189024e-08,
+    "com_world": [
+      0.12400074861236048,
+      0.35630732969584006,
+      0.5269220030714994
+    ],
+    "feet_position_change_max_m": 6.54114349845824e-08,
+    "feet_orientation_change_max_deg": 2.9608178974663982e-05,
+    "max_joint_change_deg": 11.031984943621195
+  },
+  "joint_limit_violation_max_rad": 0.0,
+  "solver_nfev": 189,
+  "all_modified_velocity_arrays_regenerated": true,
+  "new_knee_toe_contact_targets_added": false,
+  "original_motion_unchanged": true,
+  "self_collision_validated": false,
+  "dynamics_validated": false,
+  "hardware_approved": false,
+  "gpu_started": false
+}

@@ -1,0 +1,166 @@
+{
+  "fallback_wheels": [
+    {
+      "bytes": 135811,
+      "mode": "100644",
+      "path": "flux/wheelhouse/absl_py-2.3.1-py3-none-any.whl",
+      "sha": "f67efd694382e4a0386cae2f4ac06fb312d0b113",
+      "type": "blob"
+    },
+    {
+      "bytes": 22228,
+      "mode": "100644",
+      "path": "flux/wheelhouse/cloudpickle-3.1.2-py3-none-any.whl",
+      "sha": "53ce1f9f377bdfb84d5395eda3f61a156d028bc3",
+      "type": "blob"
+    },
+    {
+      "bytes": 62794,
+      "mode": "100644",
+      "path": "flux/wheelhouse/gitdb-4.0.12-py3-none-any.whl",
+      "sha": "1da1660450c03ebee6c5fb5f03d27c61535b475c",
+      "type": "blob"
+    },
+    {
+      "bytes": 208168,
+      "mode": "100644",
+      "path": "flux/wheelhouse/gitpython-3.1.45-py3-none-any.whl",
+      "sha": "8f3784a097658d36fac3838f4692edaa55420c00",
+      "type": "blob"
+    },
+    {
+      "bytes": 6615417,
+      "mode": "100644",
+      "path": "flux/wheelhouse/grpcio-1.76.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "sha": "35b4d7763f384b01fb7021c6b01f92832a519c49",
+      "type": "blob"
+    },
+    {
+      "bytes": 27656,
+      "mode": "100644",
+      "path": "flux/wheelhouse/importlib_metadata-8.7.0-py3-none-any.whl",
+      "sha": "a43850e62ed6cc87c9c84d2dde3aae09cc1ebdb8",
+      "type": "blob"
+    },
+    {
+      "bytes": 107678,
+      "mode": "100644",
+      "path": "flux/wheelhouse/markdown-3.10-py3-none-any.whl",
+      "sha": "8b70dde4629608d43070b62142049a92c8a04e84",
+      "type": "blob"
+    },
+    {
+      "bytes": 22961,
+      "mode": "100644",
+      "path": "flux/wheelhouse/markupsafe-3.0.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl",
+      "sha": "6f7318b496f12bd24731f4eebf0022f6fe1ca58b",
+      "type": "blob"
+    },
+    {
+      "bytes": 5034975,
+      "mode": "100644",
+      "path": "flux/wheelhouse/ml_dtypes-0.5.4-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "sha": "e9556b320142633231e76a5fe7354869db1cbf81",
+      "type": "blob"
+    },
+    {
+      "bytes": 18119129,
+      "mode": "100644",
+      "path": "flux/wheelhouse/onnx-1.20.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "sha": "64724bba9a9f9601b96426dfa5a3075e303cb235",
+      "type": "blob"
+    },
+    {
+      "bytes": 136160,
+      "mode": "100644",
+      "path": "flux/wheelhouse/orjson-3.11.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "sha": "baf8d3b9f7f35be833010967e0f64091d02614c5",
+      "type": "blob"
+    },
+    {
+      "bytes": 26815,
+      "mode": "100644",
+      "path": "flux/wheelhouse/prettytable-3.3.0-py3-none-any.whl",
+      "sha": "d7c7aa9619de01ce5e96335f6d49d03bc7c77d0f",
+      "type": "blob"
+    },
+    {
+      "bytes": 24303,
+      "mode": "100644",
+      "path": "flux/wheelhouse/smmap-5.0.2-py3-none-any.whl",
+      "sha": "0ebec139c49ac9b8b4df7fa909fd378d596d5090",
+      "type": "blob"
+    },
+    {
+      "bytes": 5525680,
+      "mode": "100644",
+      "path": "flux/wheelhouse/tensorboard-2.20.0-py3-none-any.whl",
+      "sha": "ff3bb560f309e76ef8d3e53a8417e56bb4e16baf",
+      "type": "blob"
+    },
+    {
+      "bytes": 6590363,
+      "mode": "100644",
+      "path": "flux/wheelhouse/tensorboard_data_server-0.7.2-py3-none-manylinux_2_31_x86_64.whl",
+      "sha": "ed0654a64f8c8a7854560b8cc55eb3f0d6bcb216",
+      "type": "blob"
+    },
+    {
+      "bytes": 423933,
+      "mode": "100644",
+      "path": "flux/wheelhouse/tensordict-0.9.0-cp311-cp311-manylinux_2_28_x86_64.whl",
+      "sha": "ba30baeecd9793ccef9bfc5b445b3114945b6a8f",
+      "type": "blob"
+    },
+    {
+      "bytes": 45571,
+      "mode": "100644",
+      "path": "flux/wheelhouse/typing_extensions-4.16.0-py3-none-any.whl",
+      "sha": "9f9aae6adc3bf050c4101be0e7037edfedf28b7e",
+      "type": "blob"
+    },
+    {
+      "bytes": 224960,
+      "mode": "100644",
+      "path": "flux/wheelhouse/werkzeug-3.1.4-py3-none-any.whl",
+      "sha": "e37da7aa16bbc764efc2f0163193ed0193840b12",
+      "type": "blob"
+    },
+    {
+      "bytes": 10276,
+      "mode": "100644",
+      "path": "flux/wheelhouse/zipp-3.23.0-py3-none-any.whl",
+      "sha": "4b65cb52853fa06eaf3c11b8f85b8de61d019ccc",
+      "type": "blob"
+    },
+    {
+      "bytes": 703652,
+      "mode": "100644",
+      "path": "flux/wheelhouse/trimesh-4.5.1-py3-none-any.whl",
+      "sha": "2062bfe2ff18c3ab0059f7daa5a7b651dea56e57",
+      "type": "blob"
+    },
+    {
+      "bytes": 37286,
+      "mode": "100644",
+      "path": "flux/wheelhouse/wcwidth-0.2.14-py2.py3-none-any.whl",
+      "sha": "727698a7bac7706efb57195e36ffdce6b83da980",
+      "type": "blob"
+    },
+    {
+      "bytes": 43708,
+      "mode": "100644",
+      "path": "flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl",
+      "sha": "f5436b8e3cd22f07db937f0dcbc8ad4892f9273b",
+      "sha256": "65b3133a29ad53fb42c48cf5114752c7ab66c1c38544fdf6460f450c09b42591",
+      "source": "Official PyPI argcomplete3.6.2",
+      "type": "blob"
+    }
+  ],
+  "policy": "offline only; image Torch/CUDA unchanged; missing required imports fail closed",
+  "rsl_rl": {
+    "source": "https://github.com/leggedrobotics/rsl_rl/tree/v3.1.2",
+    "upstream_tree": "c49573e4d1eb6662d7b047fe935522c23665f6f3",
+    "version": "3.1.2"
+  }
+}

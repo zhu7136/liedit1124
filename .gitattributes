@@ -1,0 +1,4 @@
+source-parts/* -text
+source-overlay/** -text
+launch.py -text
+source.json -text

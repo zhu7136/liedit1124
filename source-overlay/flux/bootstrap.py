@@ -1,4 +1,4 @@
-"""One authorized60-minute upright knee/toe trial, one GPU; no automatic retry."""
+"""One authorized60-minute new-motion/task300-rewards trial; no automatic retry."""
 import argparse,base64,hashlib,importlib.metadata,importlib.util,json,os,runpy,signal,subprocess,sys,time,urllib.parse,urllib.request,zipfile
 from pathlib import Path
 
@@ -76,7 +76,7 @@ def worker(started):
                 break
     verify_inputs()
     prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/gui00528900_knee_toe_upright_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','limx_hu_d04_01_upright_knee_toe_hold20s','--run_name','upright_knee_toe_4096_fresh_60min','--logger','tensorboard','--headless','--device','cuda:0']
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/gui00528900_knee_toe_upright_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','limx_hu_d04_01_task300_rewards_new_motion','--run_name','task300_rewards_new_motion_4096_fresh_60min','--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 
 def seal_and_archive(child_code,reason):

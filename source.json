@@ -130,14 +130,16 @@
     ],
     "changed_source_files": [
       "flux/bootstrap.py",
-      "flux/dependencies.json"
+      "flux/dependencies.json",
+      "flux/toe_training_hooks.py",
+      "scripts/rsl_rl/train.py"
     ],
     "files": [
       {
-        "bytes": 12435,
-        "git_blob": "a2e77d4a701a04d1fc3943c022fbcedcef48a0f5",
+        "bytes": 12448,
+        "git_blob": "4c82883861df7ecaf55c70e13b1f3bcd4ea3fff4",
         "path": "flux/bootstrap.py",
-        "sha256": "66aebed4a614eef9aec5ac6c84cc4670d1acaceea76762e685ec7584417ff703"
+        "sha256": "0fcf0be7f9bc8f0cbb8dccfedcae218fe21729e6892ae322f1df136decc75fc3"
       },
       {
         "bytes": 5213,
@@ -159,19 +161,31 @@
       },
       {
         "bytes": 14431,
-        "git_blob": "ebc49be35fad56b9d90ee291e08404bc9323db48",
+        "git_blob": "0163a81d441aebdb0894e71f565e86ff1aa033f5",
         "path": "flux/source_manifest.json",
-        "sha256": "e76bde55b3ae58fd88404aef0788f157b3dc22fcbe61ee453f14fd962a684167"
+        "sha256": "6c84cd6702f40197c2353acaf7ce8cb6b38f4fddd35f6dcf6b694c2419835379"
+      },
+      {
+        "bytes": 8575,
+        "git_blob": "f303a15a05f080c42d0f8d26b40cbe7fdb6ba9a1",
+        "path": "flux/toe_training_hooks.py",
+        "sha256": "6eb6b6d817694dd2ea33270694a715718b76eb754501bb32153c9186ef6230fe"
       },
       {
         "bytes": 43708,
         "git_blob": "f5436b8e3cd22f07db937f0dcbc8ad4892f9273b",
         "path": "flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl",
         "sha256": "65b3133a29ad53fb42c48cf5114752c7ab66c1c38544fdf6460f450c09b42591"
+      },
+      {
+        "bytes": 11703,
+        "git_blob": "fac5795dc65ad240cbe7ee3e9e494f003effd09c",
+        "path": "scripts/rsl_rl/train.py",
+        "sha256": "7dd2b703c6702aed1feee3213e77179c39c759c46a1aebd19c1deb637821b420"
       }
     ],
     "final_file_count": 116,
-    "final_source_manifest_sha256": "e76bde55b3ae58fd88404aef0788f157b3dc22fcbe61ee453f14fd962a684167",
+    "final_source_manifest_sha256": "6c84cd6702f40197c2353acaf7ce8cb6b38f4fddd35f6dcf6b694c2419835379",
     "format": "hud04_offline_dependency_overlay_v1"
   },
   "repo": "zhu7136/liedit1124",

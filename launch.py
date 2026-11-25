@@ -1,10 +1,10 @@
-"""Local Git shards plus a pinned small offline-dependency overlay; no HTTP."""
+"""Pinned new-motion/task300-rewards overlay on local verified shards; no HTTP."""
 import argparse,hashlib,json,os,runpy,signal,stat,subprocess,time,zipfile
 import sys
 from pathlib import Path,PurePosixPath
 
 MAX_ARCHIVE=90*1024**2
-OVERLAY_PATHS={'flux/bootstrap.py','flux/dependencies.json','flux/source_manifest.json','flux/offline-wheel-manifest.json','flux/offline-requirements.lock','flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl'}
+OVERLAY_PATHS={'flux/bootstrap.py','flux/dependencies.json','flux/source_manifest.json','flux/offline-wheel-manifest.json','flux/offline-requirements.lock','flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl','scripts/rsl_rl/train.py','flux/toe_training_hooks.py'}
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def event(event_type,**kw):print(json.dumps({'event':event_type,**kw}),flush=True)
 def check_descriptor(d):

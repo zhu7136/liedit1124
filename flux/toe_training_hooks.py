@@ -1,19 +1,19 @@
-"""Budget and provenance instrumentation; no reward/dynamics modifications."""
+"""Bounded upright/knee-toe training metrics and verified deploy export."""
 import hashlib,json,math,os,time,shutil
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'outputs/toe_training'
 SOFT_DEADLINE=float(os.environ.get('TOE_SOFT_DEADLINE','0'))
-SHA='3d4bd08212cd96509af9ca46d4f9554b53004a3446dd4c64159c7555842c5fda'
+SHA='d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a'
 
 def cuda_snapshot(stage):
     import torch
     free,total=torch.cuda.mem_get_info(0)
     event('cuda_memory',stage=stage,free_bytes=free,total_bytes=total,allocated_bytes=torch.cuda.memory_allocated(0),reserved_bytes=torch.cuda.memory_reserved(0))
 
-def event(name,**kw):
-    row={'event':name,'elapsed_seconds':round(time.monotonic()-float(os.environ.get('TOE_WORKER_STARTED',str(time.monotonic()))),3),**kw}
+def event(event_type,**kw):
+    row={'event':event_type,'elapsed_seconds':round(time.monotonic()-float(os.environ.get('TOE_WORKER_STARTED',str(time.monotonic()))),3),**kw}
     OUT.mkdir(parents=True,exist_ok=True)
     with (OUT/'events.jsonl').open('a') as f:f.write(json.dumps(row,allow_nan=False)+'\n')
     print(json.dumps(row,allow_nan=False),flush=True)
@@ -39,6 +39,10 @@ def audit_environment(env):
         raise RuntimeError('Policy must output29 controlled-joint actions')
     if raw.cfg.episode_length_s!=25.0:
         raise RuntimeError('Long reference requires the approved25s episode configuration')
+    from hold_support import gated_undesired_contacts,hold_upright,hold_support_contacts
+    assert raw.cfg.rewards.undesired_contacts.func is gated_undesired_contacts
+    assert raw.cfg.rewards.hold_torso_upright.func is hold_upright
+    assert raw.cfg.rewards.hold_four_support.func is hold_support_contacts
     motion=Path(cfg.motion_file)
     if hashlib.sha256(motion.read_bytes()).hexdigest()!=SHA:raise RuntimeError('Motion input hash changed')
     event('environment_constructed',num_envs=raw.num_envs,tracked_bodies=len(names),motion_sha256=SHA,joint_count=len(joint_names),body_order_verified=True,actor_obs_dim=154,action_dim=29,episode_length_s=25.0)
@@ -72,6 +76,8 @@ def run_bounded_training(runner,iterations,env):
             value=float(tensor.mean().item())
             if not math.isfinite(value):raise RuntimeError('Non-finite motion metric: '+name)
             metrics['motion/'+name]=value
+        from hold_support import hold_stats
+        metrics.update(hold_stats(env))
         if updates==1 or updates%25==0 or time.monotonic()>=SOFT_DEADLINE:
             for parameter in runner.alg.policy.parameters():
                 if not torch.isfinite(parameter).all():raise RuntimeError('Non-finite policy parameter')
@@ -103,13 +109,15 @@ def export_deployment(runner):
     normalizer=getattr(policy,'actor_obs_normalizer',None)
     export_policy_as_jit(policy,normalizer=normalizer,path=str(OUT),filename='policy.pt')
     export_policy_as_onnx(policy,normalizer=normalizer,path=str(OUT),filename='policy.onnx')
-    source=Path(runner.log_dir)/'params/deploy.yaml'
+    source=OUT/'deploy.yaml'
     cfg=yaml.safe_load(source.read_text())
     if sum(len(v['scale']) for v in cfg['observations'].values())!=154:
         raise RuntimeError('Deployment observation metadata does not match154 inputs')
     if len(cfg['actions']['joint_pos']['joint_names'])!=29:
         raise RuntimeError('Deployment action metadata does not match29 joints')
-    shutil.copy2(source,OUT/'deploy.yaml')
+    proof=json.loads((OUT/'deploy_verification.json').read_text())
+    assert hashlib.sha256(source.read_bytes()).hexdigest()==proof['controller_deploy_sha256']
+    assert proof['motion_sha256']==SHA
     saved=torch.jit.load(str(OUT/'policy.pt'),map_location='cpu').eval()
     with torch.inference_mode():
         result=saved(torch.zeros(1,154))

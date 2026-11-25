@@ -1,4 +1,35 @@
-# HU_D04 No-State-Estimation / toe-parallel plus20s — one bounded trial
+# HU_D04 upright torso + knees/toes support — one bounded 60min trial
+
+## CURRENT authorization 2026-11-25T02:12:43Z (supersedes all historical notes)
+
+User approved ONE fresh GPU trial <=3600s including initialization/save/export,
+and public upload of this trial's source/reference/output, no credentials.
+Single4090D24GB,4096envs, seed42,154actor inputs->29actions,25s episodes.
+No automatic retries, additional GPU, checkpoint warm-start or OOM fallback.
+Input motions/gui00528900_knee_toe_upright_candidate/motion.npz,1187frames50Hz,
+SHA256 d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a.
+Final20s reference has upright upper torso and bilateral knee/toe geometry
+support with static COM centering. Dynamics/contacts/policy tracking unproven.
+
+Reward change: only at motionframe>=186 allow knee contacts (other unwanted
+contacts still penalized); hold-only upright torso reward weight.5/std.15rad,
+four-link contact reward weight.5/5Nthreshold (knees and ankle-roll bodies).
+These contact sensors do NOT prove toe-edge location or equal support loads.
+Native motion tracking/safety limits/terminations/physics remain unchanged.
+Worker hard3600s, PPO soft3420s, child3540s, startup420s, no automatic retry.
+
+deploy.yaml is converted with BaseLoader+explicit scalar schema BEFORE PPO,
+validated for154->29 interface, returned by log chunks AND data-only PT bundle.
+Original native deploy YAML is retained separately. Parent repeats metadata
+delivery outside Isaac logging after child shutdown. Event logger accepts
+name= metadata without argument collision. Outputs include final_checkpoint.pt,
+policy.pt,policy.onnx,deploy.yaml,deploy_native.yaml,deploy_verification.json,
+controller_bundle.pt,metrics/configs/native logs/ZIP via native Flux archival.
+No service credentials are forwarded to the GPU worker.
+
+Simulation only: not proof of stable20s hold, closed-loop success or hardware
+safety. Previous branches/main/models are preserved. Below is historical
+provenance ONLY and is not this trial's authorization or input configuration.
 
 ## Superseding authorization 2026-11-24T08:40:48Z:60-minute replacement
 

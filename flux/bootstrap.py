@@ -1,4 +1,4 @@
-"""One authorized60-minute replacement, one GPU. No restart and no API keys."""
+"""One authorized60-minute upright knee/toe trial, one GPU; no automatic retry."""
 import argparse,base64,hashlib,importlib.metadata,importlib.util,json,os,runpy,signal,subprocess,sys,time,urllib.parse,urllib.request,zipfile
 from pathlib import Path
 
@@ -9,7 +9,7 @@ SOFT_SECONDS=3420
 CHILD_SECONDS=3540
 STARTUP_SECONDS=420
 
-def event(name,**kw):print(json.dumps({'event':name,**kw},allow_nan=False),flush=True)
+def event(event_type,**kw):print(json.dumps({'event':event_type,**kw},allow_nan=False),flush=True)
 
 def verify_inputs():
     manifest=json.loads((ROOT/'flux/source_manifest.json').read_text())
@@ -63,10 +63,15 @@ def worker(started):
                 break
     verify_inputs()
     prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/gui00528900_toe_vertical_parallel_plus20s/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','limx_hu_d04_01_flat_beyondmimic_nostate_toe_hold20s','--run_name','nostate_toe_hold20s_4096_fresh_60min','--logger','tensorboard','--headless','--device','cuda:0']
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/gui00528900_knee_toe_upright_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','limx_hu_d04_01_upright_knee_toe_hold20s','--run_name','upright_knee_toe_4096_fresh_60min','--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 
 def seal_and_archive(child_code,reason):
+    sys.path.insert(0,str(ROOT/'flux'))
+    from deploy_delivery import return_metadata,bundle_backup
+    if (OUT/'deploy_verification.json').is_file():
+        return_metadata(OUT,event)
+        bundle_backup(OUT,ROOT/'motions/gui00528900_knee_toe_upright_candidate/motion.npz',event)
     record={'child_exit_code':child_code,'parent_stop_reason':reason,'worker_seconds':WORKER_SECONDS,'automatic_retries':0,'completion_present':(OUT/'completion.json').is_file()}
     (OUT/'parent_result.json').write_text(json.dumps(record,indent=2))
     files=[p for p in OUT.rglob('*') if p.is_file()]
@@ -87,8 +92,11 @@ def main():
         worker(args.started);return
     started=time.monotonic();child=None
     def cutoff(*unused):
-        if child is not None and child.poll() is None:os.killpg(child.pid,signal.SIGKILL)
-        raise TimeoutError('Worker3600-second limit reached')
+        if child is not None and child.poll() is None:
+            try:os.killpg(child.pid,signal.SIGKILL)
+            except ProcessLookupError:pass
+        event('worker_hard_deadline',worker_limit_seconds=WORKER_SECONDS,automatic_retries=0)
+        os._exit(124)
     signal.signal(signal.SIGALRM,cutoff);signal.alarm(WORKER_SECONDS)
     try:
         if not args.commit or OUT.exists():raise RuntimeError('Requires pinned commit and fresh output directory; no restart')

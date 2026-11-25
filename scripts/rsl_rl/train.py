@@ -217,6 +217,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     log_dir = os.path.join(log_root_path, log_dir)
 
     # create isaac environment
+    from hold_support import configure_hold_support
+    configure_hold_support(env_cfg)
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
     from toe_training_hooks import audit_environment
     audit_environment(env)
@@ -264,6 +266,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)
     dump_yaml(os.path.join(log_dir, "params", "agent.yaml"), agent_cfg)
     export_deploy_cfg(env.unwrapped, log_dir)
+    # Fail early on metadata/schema problems, before spending the training hour.
+    from toe_training_hooks import OUT, event
+    from deploy_delivery import clean_metadata, return_metadata
+    proof = clean_metadata(os.path.join(log_dir, "params", "deploy.yaml"), env.unwrapped, OUT)
+    event("deploy_metadata_preflight_passed", **proof)
+    return_metadata(OUT, event)
     # copy the environment configuration file to the log directory
     shutil.copy(
         inspect.getfile(env_cfg.__class__),

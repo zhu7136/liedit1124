@@ -229,7 +229,10 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # save resume path before creating a new log_dir
     init_checkpoint_path = None
     if agent_cfg.resume or agent_cfg.algorithm.class_name == "Distillation":
-        resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
+        if args_cli.resume and args_cli.checkpoint and os.path.isfile(args_cli.checkpoint):
+            resume_path = os.path.abspath(args_cli.checkpoint)
+        else:
+            resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
     elif args_cli.init_checkpoint is not None:
         init_checkpoint_path = retrieve_file_path(args_cli.init_checkpoint)
 
@@ -256,7 +259,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if agent_cfg.resume or agent_cfg.algorithm.class_name == "Distillation":
         print(f"[INFO]: Loading model checkpoint from: {resume_path}")
         # load previously trained model
-        runner.load(resume_path)
+        from toe_training_hooks import restore_verified_checkpoint
+        restore_verified_checkpoint(runner, resume_path)
     elif init_checkpoint_path is not None:
         print(f"[INFO]: Initializing model checkpoint from: {init_checkpoint_path}")
         load_init_checkpoint(runner, init_checkpoint_path)

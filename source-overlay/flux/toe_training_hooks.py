@@ -1,4 +1,4 @@
-"""Task300 original rewards with new motion; bounded metrics and verified export."""
+"""Verified task418 continuation; task300 rewards/new motion remain unchanged."""
 import hashlib,json,math,os,time,shutil
 from pathlib import Path
 
@@ -6,6 +6,34 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'outputs/toe_training'
 SOFT_DEADLINE=float(os.environ.get('TOE_SOFT_DEADLINE','0'))
 SHA='d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a'
+CHECKPOINT_SHA='6fcf5fa00b7aac83e3def8fb35be4e5a395a4621c1704a09aec9b1b76a3d398c'
+PARENT_UPDATES=2094
+
+def restore_verified_checkpoint(runner,path):
+    import torch
+    path=Path(path)
+    if path.stat().st_size!=6724913 or hashlib.sha256(path.read_bytes()).hexdigest()!=CHECKPOINT_SHA:
+        raise RuntimeError('Task418 resume checkpoint size/hash mismatch')
+    checkpoint=torch.load(path,map_location='cpu',weights_only=True)
+    if checkpoint['iter']!=2093 or not checkpoint['optimizer_state_dict']['state']:
+        raise RuntimeError('Unexpected parent iteration or missing Adam state')
+    runner.load(str(path),load_optimizer=True,map_location=runner.device)
+    def identical(a,b):
+        if isinstance(a,torch.Tensor):return isinstance(b,torch.Tensor) and torch.equal(a.cpu(),b.cpu())
+        if isinstance(a,dict):return isinstance(b,dict) and a.keys()==b.keys() and all(identical(a[k],b[k]) for k in a)
+        if isinstance(a,(tuple,list)):return type(a)==type(b) and len(a)==len(b) and all(identical(x,y) for x,y in zip(a,b))
+        return a==b
+    if not identical(checkpoint['model_state_dict'],runner.alg.policy.state_dict()):
+        raise RuntimeError('Actor/critic/noise restoration verification failed')
+    if not identical(checkpoint['optimizer_state_dict'],runner.alg.optimizer.state_dict()):
+        raise RuntimeError('Adam restoration verification failed')
+    if runner.current_learning_iteration!=2093:raise RuntimeError('Native iteration restore failed')
+    rates={float(g['lr']) for g in runner.alg.optimizer.param_groups}
+    if len(rates)!=1:raise RuntimeError('Unexpected optimizer learning rates')
+    runner.alg.learning_rate=rates.pop()
+    runner.current_learning_iteration=PARENT_UPDATES
+    runner._toe_resume_verified=True
+    event('resume_verified',parent_task_id='TASK_20261125_418',checkpoint_sha256=CHECKPOINT_SHA,saved_iteration=2093,next_iteration=PARENT_UPDATES,parent_completed_updates=PARENT_UPDATES,optimizer_restored=True,model_tensors_restored=True,adaptive_learning_rate=runner.alg.learning_rate,environment_state_restored=False,rng_state_restored=False)
 
 def cuda_snapshot(stage):
     import torch
@@ -56,7 +84,8 @@ def run_bounded_training(runner,iterations,env):
     import torch
     if SOFT_DEADLINE<=time.monotonic()+10:raise RuntimeError('Insufficient remaining worker budget for training')
     original=runner.log;updates=0;start=time.monotonic()
-    if runner.current_learning_iteration!=0:raise RuntimeError('Approved fresh training must start at iteration zero')
+    if runner.current_learning_iteration!=PARENT_UPDATES or not getattr(runner,'_toe_resume_verified',False):
+        raise RuntimeError('Refusing fresh/unverified training; must continue task418 at2094')
     def bounded_log(locs,*args,**kwargs):
         nonlocal updates
         original(locs,*args,**kwargs)
@@ -103,7 +132,7 @@ def run_bounded_training(runner,iterations,env):
     if runner.writer is not None:
         runner.writer.flush()
         runner.writer.close()
-    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':SHA,'checkpoint_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),'checkpoint_bytes':destination.stat().st_size,'num_envs':4096,'fresh_training':True,'actor_obs_dim':154,'action_dim':29,'episode_length_s':25.0,'dynamics_validated':False,'hardware_approved':False}
+    record={'completed_updates':updates,'cumulative_updates':PARENT_UPDATES+updates,'parent_task_id':'TASK_20261125_418','parent_checkpoint_sha256':CHECKPOINT_SHA,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':SHA,'checkpoint_sha256':hashlib.sha256(destination.read_bytes()).hexdigest(),'checkpoint_bytes':destination.stat().st_size,'num_envs':4096,'fresh_training':False,'optimizer_restored':True,'environment_state_restored':False,'rng_state_restored':False,'actor_obs_dim':154,'action_dim':29,'episode_length_s':25.0,'dynamics_validated':False,'hardware_approved':False}
     if record['checkpoint_bytes']<10000:raise RuntimeError('Empty final checkpoint')
     (OUT/'completion.json').write_text(json.dumps(record,indent=2,allow_nan=False))
     event('checkpoint_saved',**record)

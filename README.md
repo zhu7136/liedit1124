@@ -1,11 +1,11 @@
-# HU_D04 new motion with task300 original rewards
+# HU_D04 TASK_20261125_418 continuation
 
-Authorized 2026-11-25T06:30:23Z. One fresh GPU trial, 4096 environments, seed42, worker ceiling3600s including initialization/export; no automatic retries.
+Authorized2026-11-25T07:45:49Z: ONE further GPU trial,4096 environments,seed42,worker<=1800s INCLUDING source reconstruction/init/save/export; soft1620/child1740/startup420. No automatic retries or fresh fallback.
 
-Target: motion_knee_toe_upright_candidate.npz; worker motion.npz has identical bytes, SHA256 d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a.
+Resume parent TASK_20261125_418 final_checkpoint.pt (2094 completed updates,saved iteration2093),SHA256 6fcf5fa00b7aac83e3def8fb35be4e5a395a4621c1704a09aec9b1b76a3d398c. Flux mounts the exact parent checkpoint at /workspace/flux_resume. Restore model+Adam+adaptive learning rate and start iteration2094; environment/RNG not saved by parent and are reinitialized.
 
-Reward baseline: TASK_20261124_300. All original tracking rewards and undesired-contact penalty retained. NO added upright reward, NO four-support/contact reward, NO knee-contact exemption. hold_support.py remains an INACTIVE legacy file in the base archive and is not imported. Runtime audit rejects either added reward and requires original contact-penalty function.
+Motion: knee-toe-upright candidate SHA256 d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a. Rewards/physics IDENTICAL to parent418 and original task300: no added upright/contact reward or knee exemption. Legacy hold_support.py remains INACTIVE, never imported.
 
-The 16 pinned local Git shards contain the base source; the 8-file SHA256-pinned overlay restores task300 reward behavior and retains verified offline dependencies/deploy export. No worker HTTP downloads or service credentials. Loader reconstructs and verifies116 source files before execution.
+16 local Git shards plus8 pinned overlay files reconstruct116 source files.23 offline hashed wheels, no worker HTTP or forwarded service credentials.55 CPU configuration/integrity checks and4 tests of exact native RSL load/model+Adam restoration passed; actual GPU resume remains subject to runtime audit. No convergence/sim-to-sim/hardware approval.
 
-52 CPU integrity/configuration checks passed; this does not prove GPU speed, training convergence or hardware safety. The preceding task290 sampling regression remains a measured risk. No hardware deployment approved.
+Parent policy/deploy ZIP is published separately on results/task418-policy-deploy-20261125. No credentials, private URLs or raw logs included.

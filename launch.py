@@ -1,4 +1,4 @@
-"""Pinned new-motion/task300-rewards overlay on local verified shards; no HTTP."""
+"""Pinned task418 continuation overlay; local shards and Flux checkpoint mount only."""
 import argparse,hashlib,json,os,runpy,signal,stat,subprocess,time,zipfile
 import sys
 from pathlib import Path,PurePosixPath
@@ -76,7 +76,7 @@ def main():
     mode=p.add_mutually_exclusive_group(required=True);mode.add_argument('--verify-only',action='store_true');mode.add_argument('--train',action='store_true')
     p.add_argument('--work-dir',type=Path);args=p.parse_args();started=time.monotonic()
     def cutoff(*unused):event('source_delivery_hard_timeout');os._exit(124)
-    signal.signal(signal.SIGALRM,cutoff);signal.alarm(3600 if args.train else 120)
+    signal.signal(signal.SIGALRM,cutoff);signal.alarm(1800 if args.train else 120)
     root=Path(__file__).resolve().parent
     if args.train:
         assert args.expected_loader_commit and not args.work_dir,'Training requires pinned loader commit and default workload path'
@@ -95,6 +95,7 @@ def main():
     event('source_delivery_verified',archive_sha256=sha(contents),files=descriptor['overlay']['final_file_count'],seconds=round(time.monotonic()-started,3),training_started=False,delivery='local_git_shards_with_dependency_overlay')
     if args.verify_only:signal.alarm(0);return
     os.environ['DELIVERY_STARTED_MONOTONIC']=str(started);os.environ['DELIVERY_MANIFEST_SHA256']=args.expected_manifest_sha256
+    os.environ['TOE_RESUME_MOUNT']='/workspace/flux_resume'
     entry=destination/'flux/bootstrap.py';assert entry.is_file();sys.argv=[str(entry),'--commit',args.expected_loader_commit]
     runpy.run_path(str(entry),run_name='__main__')
 if __name__=='__main__':main()

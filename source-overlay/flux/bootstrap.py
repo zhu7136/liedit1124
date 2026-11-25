@@ -1,12 +1,12 @@
-"""One authorized60-minute new-motion/task300-rewards trial; no automatic retry."""
+"""One authorized30-minute task418 continuation; verified model+Adam, no retries."""
 import argparse,base64,hashlib,importlib.metadata,importlib.util,json,os,runpy,signal,subprocess,sys,time,urllib.parse,urllib.request,zipfile
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'outputs/toe_training'
-WORKER_SECONDS=3600
-SOFT_SECONDS=3420
-CHILD_SECONDS=3540
+WORKER_SECONDS=1800
+SOFT_SECONDS=1620
+CHILD_SECONDS=1740
 STARTUP_SECONDS=420
 
 def event(event_type,**kw):print(json.dumps({'event':event_type,**kw},allow_nan=False),flush=True)
@@ -76,7 +76,14 @@ def worker(started):
                 break
     verify_inputs()
     prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/gui00528900_knee_toe_upright_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','limx_hu_d04_01_task300_rewards_new_motion','--run_name','task300_rewards_new_motion_4096_fresh_60min','--logger','tensorboard','--headless','--device','cuda:0']
+    mount=Path(os.environ['TOE_RESUME_MOUNT'])
+    candidates=[p for p in mount.rglob('*.pt') if p.is_file()]
+    expected='6fcf5fa00b7aac83e3def8fb35be4e5a395a4621c1704a09aec9b1b76a3d398c'
+    if len(candidates)!=1 or candidates[0].stat().st_size!=6724913 or hashlib.sha256(candidates[0].read_bytes()).hexdigest()!=expected:
+        raise RuntimeError('Missing/ambiguous/incorrect task418 mounted checkpoint; NO fresh fallback')
+    resume_path=candidates[0].resolve()
+    event('resume_input_verified',parent_task_id='TASK_20261125_418',checkpoint_sha256=expected,checkpoint_bytes=6724913)
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--resume','--checkpoint',str(resume_path),'--motion_file',str(ROOT/'motions/gui00528900_knee_toe_upright_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','limx_hu_d04_01_task300_rewards_new_motion','--run_name','task418_resume_4096_30min','--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 
 def seal_and_archive(child_code,reason):
@@ -122,7 +129,7 @@ def main():
         if launcher is None:
             if sys.version_info[:2]!=(3,11):raise RuntimeError('No documented IsaacSim Python launcher found')
             launcher=sys.executable
-        event('worker_begin',commit=actual,delivery_manifest_sha256=os.environ.get('DELIVERY_MANIFEST_SHA256'),worker_limit_seconds=WORKER_SECONDS,soft_stop_seconds=SOFT_SECONDS,startup_limit_seconds=STARTUP_SECONDS,num_envs=4096,automatic_retries=0,fresh_training=True,task='LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation',actor_obs_dim=154,episode_length_s=25)
+        event('worker_begin',commit=actual,delivery_manifest_sha256=os.environ.get('DELIVERY_MANIFEST_SHA256'),worker_limit_seconds=WORKER_SECONDS,soft_stop_seconds=SOFT_SECONDS,startup_limit_seconds=STARTUP_SECONDS,num_envs=4096,automatic_retries=0,fresh_training=False,parent_task_id='TASK_20261125_418',task='LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation',actor_obs_dim=154,episode_length_s=25)
         child_log=OUT/'native.log'
         env=dict(os.environ,PYTHONUNBUFFERED='1',CUDA_VISIBLE_DEVICES='0')
         with child_log.open('w') as log:

@@ -122,6 +122,58 @@
   "format": "hud04_delivery_v1",
   "motion_sha256": "d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a",
   "original_training_commit": "3939756a0018f3dd74e880320e4ee2e9d9ddbbdf",
+  "overlay": {
+    "added_source_files": [
+      "flux/offline-requirements.lock",
+      "flux/offline-wheel-manifest.json",
+      "flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl"
+    ],
+    "changed_source_files": [
+      "flux/bootstrap.py",
+      "flux/dependencies.json"
+    ],
+    "files": [
+      {
+        "bytes": 12435,
+        "git_blob": "a2e77d4a701a04d1fc3943c022fbcedcef48a0f5",
+        "path": "flux/bootstrap.py",
+        "sha256": "66aebed4a614eef9aec5ac6c84cc4670d1acaceea76762e685ec7584417ff703"
+      },
+      {
+        "bytes": 5213,
+        "git_blob": "2e7711a1227a10f6e408192773adb4641bb7bde1",
+        "path": "flux/dependencies.json",
+        "sha256": "ac8c75308fca674ba8cad850de01e3b5d40ca6d2d096b7d4b3326e92e4014671"
+      },
+      {
+        "bytes": 2226,
+        "git_blob": "e6b674401b82cc07bde730875c1e01f492b6338d",
+        "path": "flux/offline-requirements.lock",
+        "sha256": "e2cc4f0b3431ece8fd687414c8470b920e12efc914fcc103591c6bc50724374a"
+      },
+      {
+        "bytes": 6390,
+        "git_blob": "da85bfd65862b1e724efe3f637c9abe284d53304",
+        "path": "flux/offline-wheel-manifest.json",
+        "sha256": "b7a761fca6deb1015594da0457a3b2f87cc64fc77a6add3d40347afd1b023d96"
+      },
+      {
+        "bytes": 14431,
+        "git_blob": "ebc49be35fad56b9d90ee291e08404bc9323db48",
+        "path": "flux/source_manifest.json",
+        "sha256": "e76bde55b3ae58fd88404aef0788f157b3dc22fcbe61ee453f14fd962a684167"
+      },
+      {
+        "bytes": 43708,
+        "git_blob": "f5436b8e3cd22f07db937f0dcbc8ad4892f9273b",
+        "path": "flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl",
+        "sha256": "65b3133a29ad53fb42c48cf5114752c7ab66c1c38544fdf6460f450c09b42591"
+      }
+    ],
+    "final_file_count": 116,
+    "final_source_manifest_sha256": "e76bde55b3ae58fd88404aef0788f157b3dc22fcbe61ee453f14fd962a684167",
+    "format": "hud04_offline_dependency_overlay_v1"
+  },
   "repo": "zhu7136/liedit1124",
   "source_manifest_sha256": "c324160ed796427b8511195e39f1480b0daedc364b5af1df9695619441e27d49"
 }

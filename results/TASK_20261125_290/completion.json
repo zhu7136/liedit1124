@@ -1,0 +1,16 @@
+{
+  "completed_updates": 51,
+  "last_iteration": 50,
+  "training_seconds": 3452.991,
+  "stop_reason": "worker_soft_deadline",
+  "motion_sha256": "d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a",
+  "checkpoint_sha256": "0f375d37a9e1980bc4ada2260da9f5c077abc610e3681b4c2a4c77cdce35a1aa",
+  "checkpoint_bytes": 6724913,
+  "num_envs": 4096,
+  "fresh_training": true,
+  "actor_obs_dim": 154,
+  "action_dim": 29,
+  "episode_length_s": 25.0,
+  "dynamics_validated": false,
+  "hardware_approved": false
+}

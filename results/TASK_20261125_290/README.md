@@ -1,13 +1,14 @@
-# TASK_20261125_290 — verified deploy metadata, NOT a completed model
+# TASK_20261125_290 — completed bounded training, NOT hardware validated
 
-Public upload authorized 2026-11-25T03:25:13Z.
-Training source: `75dc161b14774c95f62ce353ea47483b37c8fafa`.
-These files were reconstructed from remote task log chunks and verified against their SHA-256 manifest.
-Actor observations154, actions29, step0.02s; hardware_approved=false.
+Source commit `75dc161b14774c95f62ce353ea47483b37c8fafa`; public upload authorized2026-11-25T03:25:13Z.
+Completed51PPOupdates, zero-based last iteration50; stop_reason=worker_soft_deadline.
+Training3452.991s, configuredworkerlimit3600s, noautomaticretries.
+1x4090D24GB,4096envs,seed42,freshtraining,154actorobservations/29actions.
 
-**No checkpoint or ONNX weights are included. Training is still in progress; these configs do not establish convergence or hardware readiness.**
-A matched trained model must be retrieved, hashed and paired with these configs before use.
-deploy_native.yaml contains IsaacLab-specific Python type tags; it was syntax-checked as a node tree only, not executed. Do not use unsafe YAML loading on untrusted inputs.
-No platform logs, credentials, or private upload URLs are included.
+final_checkpoint.pt is the training checkpoint; policy.pt is TorchScript; policy.onnx is the ONNX export.
+deploy.yaml is the cleaned controller config. deploy_native.yaml contains IsaacLab-specific Python tags: inspect as data; never use unsafe YAML constructors on untrusted inputs.
+controller_bundle.pt is a data-only PyTorch container of exported policy/config/motion/completion bytes; use weights_only=True when unpacking.
+retrieval_verification.json lists actual file lengths/hashes and worker checkpoint hash verification.
 
-W&B submission/status record: https://forge.coreweave.com/wandb/zhul136-university-of-science-and-technology-of-china/HuD04_WBT/runs/27lu3jq3
+**Training completed within its time budget, but convergence, sim-to-sim, and physical robot deployment have NOT been validated. hardware_approved=false.**
+No credentials, raw platform logs, or private upload/download URLs are included.

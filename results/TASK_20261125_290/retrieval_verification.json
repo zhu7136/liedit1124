@@ -1,0 +1,111 @@
+{
+  "task_id": "TASK_20261125_290",
+  "code_commit": "75dc161b14774c95f62ce353ea47483b37c8fafa",
+  "completed_updates": 51,
+  "last_iteration": 50,
+  "stop_reason": "worker_soft_deadline",
+  "training_seconds": 3452.991,
+  "average_seconds_per_update": 67.70570588235294,
+  "checkpoint_download_hash_verified": true,
+  "controller_bundle_download_hash_verified": true,
+  "checkpoint_weights_only_load_passed": true,
+  "final_deploy_matches_early_recovered_deploy": true,
+  "files": {
+    "deploy.yaml": {
+      "bytes": 4209,
+      "sha256": "a87d24c542f528db622e78e7019d22e125dc5c672827932b934017e13694c387"
+    },
+    "deploy_native.yaml": {
+      "bytes": 5737,
+      "sha256": "d3a24c9d17b316c71dbe25a4962c693fb63d61bc1826579cf63771acebf58884"
+    },
+    "deploy_verification.json": {
+      "bytes": 1222,
+      "sha256": "fce9c5816ac84bbe956680bdac2b5785dcb4f1632e6961d65fa50558a0378a08"
+    },
+    "policy.pt": {
+      "bytes": 1001426,
+      "sha256": "1a1eae08b2cfae503a55c95ba8eee40f18079e7d6558b0074a04b87382c74e71"
+    },
+    "policy.onnx": {
+      "bytes": 990556,
+      "sha256": "56e8d679be7d3dfea9ce46282d70bd55a3f50b036f3c3a5cc320bbe31b6c5b55"
+    },
+    "completion.json": {
+      "bytes": 514,
+      "sha256": "9b210ef3f1df73a37df8da61ef7edf6e5f48683a4d6c4f303bbfdbcb732ac240"
+    },
+    "motion.npz": {
+      "bytes": 288238,
+      "sha256": "d0cb1f807c9ae38820368dff57c666d33b47581d351886e5969b6cb8c332fd5a"
+    },
+    "final_checkpoint.pt": {
+      "bytes": 6724913,
+      "sha256": "0f375d37a9e1980bc4ada2260da9f5c077abc610e3681b4c2a4c77cdce35a1aa"
+    },
+    "controller_bundle.pt": {
+      "bytes": 3419113,
+      "sha256": "13ab4b2a5d306c6bb40a4b024ee6fee665fcd292b5a2b4ca8b2157d898c379dc"
+    }
+  },
+  "first_logged_update": {
+    "event": "training_update_completed",
+    "elapsed_seconds": 107.133,
+    "iteration": 0,
+    "completed_updates": 1,
+    "training_seconds": 73.533,
+    "loss/value_function": 0.23192189857363701,
+    "loss/surrogate": 0.032510127045679835,
+    "loss/entropy": 41.06997089385986,
+    "mean_reward": -1.2889864239096642,
+    "mean_episode_length": 15.54,
+    "motion/error_anchor_pos": 0.30380451679229736,
+    "motion/error_anchor_rot": 0.6690660119056702,
+    "motion/error_anchor_lin_vel": 1.5346598625183105,
+    "motion/error_anchor_ang_vel": 4.808388710021973,
+    "motion/error_body_pos": 0.17444367706775665,
+    "motion/error_body_rot": 0.4615151286125183,
+    "motion/error_joint_pos": 1.874039888381958,
+    "motion/error_joint_vel": 14.359481811523438,
+    "motion/sampling_entropy": 0.9991518259048462,
+    "motion/sampling_top1_prob": 0.04749926179647446,
+    "motion/sampling_top1_bin": 0.625,
+    "motion/error_body_lin_vel": 1.231165885925293,
+    "motion/error_body_ang_vel": 4.086298942565918,
+    "hold/environment_count": 3441,
+    "hold/torso_tilt_deg": 36.41013922188317,
+    "hold/four_support_fraction": 1.0
+  },
+  "last_logged_update": {
+    "event": "training_update_completed",
+    "elapsed_seconds": 3418.485,
+    "iteration": 49,
+    "completed_updates": 50,
+    "training_seconds": 3384.885,
+    "loss/value_function": 0.0016621505026705563,
+    "loss/surrogate": -0.010517845570575446,
+    "loss/entropy": 25.28246307373047,
+    "mean_reward": 0.3713995509967208,
+    "mean_episode_length": 13.06,
+    "motion/error_anchor_pos": 0.16382381319999695,
+    "motion/error_anchor_rot": 0.3817656338214874,
+    "motion/error_anchor_lin_vel": 1.0572659969329834,
+    "motion/error_anchor_ang_vel": 3.1317410469055176,
+    "motion/error_body_pos": 0.12394613027572632,
+    "motion/error_body_rot": 0.31295639276504517,
+    "motion/error_joint_pos": 1.2299597263336182,
+    "motion/error_joint_vel": 11.749073028564453,
+    "motion/sampling_entropy": 0.9953515529632568,
+    "motion/sampling_top1_prob": 0.04743038862943649,
+    "motion/sampling_top1_bin": 0.7083333730697632,
+    "motion/error_body_lin_vel": 0.9937970042228699,
+    "motion/error_body_ang_vel": 2.956895112991333,
+    "hold/environment_count": 3610,
+    "hold/torso_tilt_deg": 19.624874480609417,
+    "hold/four_support_fraction": 1.0
+  },
+  "native_archive_downloaded": false,
+  "gpu_training_completion_verified": true,
+  "sim_to_sim_validated": false,
+  "hardware_approved": false
+}

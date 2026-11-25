@@ -76,13 +76,13 @@ def worker(started):
                 break
     verify_inputs()
     prepare_dependencies();os.chdir(ROOT)
-    mount=Path(os.environ['TOE_RESUME_MOUNT'])
-    candidates=[p for p in mount.rglob('*.pt') if p.is_file()]
+    # Deliver the exact public checkpoint with the integrity-pinned source.
+    resume_path=ROOT/'flux/resume_checkpoint.pt'
     expected='6fcf5fa00b7aac83e3def8fb35be4e5a395a4621c1704a09aec9b1b76a3d398c'
-    if len(candidates)!=1 or candidates[0].stat().st_size!=6724913 or hashlib.sha256(candidates[0].read_bytes()).hexdigest()!=expected:
-        raise RuntimeError('Missing/ambiguous/incorrect task418 mounted checkpoint; NO fresh fallback')
-    resume_path=candidates[0].resolve()
-    event('resume_input_verified',parent_task_id='TASK_20261125_418',checkpoint_sha256=expected,checkpoint_bytes=6724913)
+    if not resume_path.is_file() or resume_path.stat().st_size!=6724913 or hashlib.sha256(resume_path.read_bytes()).hexdigest()!=expected:
+        raise RuntimeError('Missing/incorrect bundled task418 checkpoint; NO fresh fallback')
+    resume_path=resume_path.resolve()
+    event('resume_input_verified',parent_task_id='TASK_20261125_418',checkpoint_sha256=expected,checkpoint_bytes=6724913,delivery='hashed_source_overlay')
     sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--resume','--checkpoint',str(resume_path),'--motion_file',str(ROOT/'motions/gui00528900_knee_toe_upright_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','limx_hu_d04_01_task300_rewards_new_motion','--run_name','task418_resume_4096_30min','--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 

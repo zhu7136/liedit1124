@@ -1,10 +1,11 @@
-"""Pinned task418 continuation overlay; local shards and Flux checkpoint mount only."""
+"""Pinned task418 continuation with local shards and a verified public checkpoint."""
 import argparse,hashlib,json,os,runpy,signal,stat,subprocess,time,zipfile
 import sys
 from pathlib import Path,PurePosixPath
 
 MAX_ARCHIVE=90*1024**2
 OVERLAY_PATHS={'flux/bootstrap.py','flux/dependencies.json','flux/source_manifest.json','flux/offline-wheel-manifest.json','flux/offline-requirements.lock','flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl','scripts/rsl_rl/train.py','flux/toe_training_hooks.py'}
+OVERLAY_PATHS.add('flux/resume_checkpoint.pt')
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def event(event_type,**kw):print(json.dumps({'event':event_type,**kw}),flush=True)
 def check_descriptor(d):
@@ -18,7 +19,7 @@ def check_descriptor(d):
         assert all(v in '0123456789abcdef' for v in c['sha256']+c['git_blob'])
     overlay=d['overlay'];assert overlay['format']=='hud04_offline_dependency_overlay_v1'
     assert len(overlay['files'])==len(OVERLAY_PATHS) and {e['path'] for e in overlay['files']}==OVERLAY_PATHS
-    assert sum(e['bytes'] for e in overlay['files'])<300000
+    assert sum(e['bytes'] for e in overlay['files'])<8*1024**2
 def local_parts(root,descriptor):
     directory=root/'source-parts'
     assert directory.is_dir() and not directory.is_symlink(),'Missing local Git shards; no network fallback'

@@ -126,6 +126,7 @@
     "added_source_files": [
       "flux/offline-requirements.lock",
       "flux/offline-wheel-manifest.json",
+      "flux/resume_checkpoint.pt",
       "flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl"
     ],
     "changed_source_files": [
@@ -136,10 +137,10 @@
     ],
     "files": [
       {
-        "bytes": 13102,
-        "git_blob": "01fd9e34afeff61eb9e8023ffb1e094b6b29792e",
+        "bytes": 13141,
+        "git_blob": "6cdcfd58ac1419b01df202228f222802d07a24c5",
         "path": "flux/bootstrap.py",
-        "sha256": "ab57ff5cbd082a7f14e8bc5436b122fa63738421e442c0c497844fc6492501d8"
+        "sha256": "0c329b1edbdd071676241f4749e6086e1d67ace18bacd1cd8f8e854c2f4ee6ff"
       },
       {
         "bytes": 5213,
@@ -160,10 +161,16 @@
         "sha256": "b7a761fca6deb1015594da0457a3b2f87cc64fc77a6add3d40347afd1b023d96"
       },
       {
-        "bytes": 14431,
-        "git_blob": "1589b7e0cd04373d1b6e65840fd1ef1ddfe085b7",
+        "bytes": 6724913,
+        "git_blob": "374601942d78e7052b2b405581695177621ec680",
+        "path": "flux/resume_checkpoint.pt",
+        "sha256": "6fcf5fa00b7aac83e3def8fb35be4e5a395a4621c1704a09aec9b1b76a3d398c"
+      },
+      {
+        "bytes": 14530,
+        "git_blob": "ee4c7ca494c9c1a027de3d778720f7924a7bae50",
         "path": "flux/source_manifest.json",
-        "sha256": "fd4631c2bfb567e8fe1dd8b3b603c500b6086aa4e1c2ef4621e855cac30efda9"
+        "sha256": "96d617170de3da324adf23aaa45ebf2aae0f5041975c3c715e7a909aa57c1feb"
       },
       {
         "bytes": 10986,
@@ -184,8 +191,8 @@
         "sha256": "2371405fbf07c6eb2cab419f52608cea17a0e8f088bdd4d743d64df62e67a977"
       }
     ],
-    "final_file_count": 116,
-    "final_source_manifest_sha256": "fd4631c2bfb567e8fe1dd8b3b603c500b6086aa4e1c2ef4621e855cac30efda9",
+    "final_file_count": 117,
+    "final_source_manifest_sha256": "96d617170de3da324adf23aaa45ebf2aae0f5041975c3c715e7a909aa57c1feb",
     "format": "hud04_offline_dependency_overlay_v1"
   },
   "repo": "zhu7136/liedit1124",

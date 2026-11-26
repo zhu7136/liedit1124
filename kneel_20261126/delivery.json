@@ -97,7 +97,8 @@
     "vendor/rsl_rl/rsl_rl/utils/utils.py": "62372efd6b9c8015969c5efa0ae7f73fda45d3e39bf0a771aeabfe4f44526121",
     "vendor/rsl_rl/rsl_rl/utils/wandb_utils.py": "efdde442b3bc1f945991aeaa07918d741e993fce480dc172a9cb2966d3707e45"
   },
-  "child_seconds": 3540,
+  "checkpoint_delivery": "Flux native OSS checkpoint mount /workspace/flux_resume512",
+  "child_seconds": 2340,
   "chunks": [
     {
       "bytes": 3145728,
@@ -213,28 +214,35 @@
     }
   ],
   "episode_length_s": 30.0,
-  "final_manifest_sha256": "33d7ed250664e8853859fff8660dcf97505902a7eb5ce142f911ceca47f405e6",
+  "expected_actor_observation_dim": 154,
+  "final_manifest_sha256": "f0015cf653b87619d73b32cb655b8832f79bd219307dfdef4344f7b44774a6e2",
   "format": "kneel_git_shards_v1",
-  "fresh_training": true,
+  "fresh_training": false,
   "motion_sha256": "12ceddb49bf5e8a795dc69f8132853d86655ec7126524cea6d166be0714c3714",
   "num_envs": 4096,
   "overlay_files": {
     "flux/dependencies.json": "ac8c75308fca674ba8cad850de01e3b5d40ca6d2d096b7d4b3326e92e4014671",
-    "flux/kneel_hooks.py": "95509ea9d9a3b628a0a156a01298bde25314b8d3e7dd7eced777b34f1ce1fd20",
-    "flux/kneel_worker.py": "a14a6c19dffbb33b0c5f579b986c9448e269ccbcbb9c88c55290781c3f085b5c",
+    "flux/kneel_hooks.py": "a99e8338ddb28b33b712680f11a003102969aa644d15660c6e53254a70f9d96f",
+    "flux/kneel_resume.py": "c8c9c3a3bef5a2a2899fb950021a3dc7377f1d46963b5acf7bfcd2c594d35707",
+    "flux/kneel_worker.py": "bad20808536a97728f1cefc2870a80861eb496ab08e12f54624bfe764e26e3ab",
     "flux/offline-wheel-manifest.json": "b7a761fca6deb1015594da0457a3b2f87cc64fc77a6add3d40347afd1b023d96",
     "flux/offline_dependencies.py": "1339ab5f409b6b17d89b52ea8a06b266869097a09884818507b2ae2c71b85240",
-    "flux/source_manifest.json": "33d7ed250664e8853859fff8660dcf97505902a7eb5ce142f911ceca47f405e6",
+    "flux/source_manifest.json": "f0015cf653b87619d73b32cb655b8832f79bd219307dfdef4344f7b44774a6e2",
     "flux/wheelhouse/argcomplete-3.6.2-py3-none-any.whl": "65b3133a29ad53fb42c48cf5114752c7ab66c1c38544fdf6460f450c09b42591",
     "motions/kneel_candidate/motion.npz": "12ceddb49bf5e8a795dc69f8132853d86655ec7126524cea6d166be0714c3714",
-    "scripts/rsl_rl/train.py": "5a20d14564d063ac71109ef4379dee0e155bc461948b00f6c16007884408fb1c",
+    "scripts/rsl_rl/train.py": "fc70a782bd900cbb4161e713f29c077b6db776c97fba32a1a4210a40db405a28",
     "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/beyondmimic_env_cfg.py": "b551a352af6941d2ba59e5a43ab53db2b52115b623c3fb3edcd311d4e36fbe6e"
   },
+  "resume_checkpoint_sha256": "234f686f8bad05b814921d2e60d5d8659ffa4c7ee7082f359d3de0d976a6f3fb",
+  "resume_iteration": 2021,
+  "resume_source_completed_updates": 2022,
+  "resume_source_task": "TASK_20261126_512",
   "seed": 42,
-  "soft_seconds": 3420,
+  "soft_seconds": 2220,
   "source_archive_bytes": 48147083,
   "source_archive_sha256": "045f4a075da2588bcd6d0960689af1a6c422c93c9d782353dde94e16c20f76e7",
   "startup_seconds": 600,
-  "task": "LimX-HU-D04-01-Flat-BeyondMimic",
-  "worker_seconds": 3600
+  "state_estimation_policy_inputs": false,
+  "task": "LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation",
+  "worker_seconds": 2400
 }

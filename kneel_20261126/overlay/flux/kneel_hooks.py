@@ -1,4 +1,4 @@
-"""Fresh standard-task auditing, bounded PPO, and checkpoint provenance."""
+"""Resumed No-State-Estimation auditing, bounded PPO, and checkpoint provenance."""
 import hashlib,json,math,os,shutil,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
@@ -20,9 +20,11 @@ def audit_environment(env):
     _,joints=robot.find_joints(cfg.joint_names,preserve_order=True)
     if joints!=order['joint_names']:raise RuntimeError('29-joint ordering mismatch')
     assert len(names)==14 and raw.num_envs==4096
-    assert tuple(raw.observation_manager.group_obs_dim['policy'])==(160,)
-    expected=['command','motion_anchor_pos_b','motion_anchor_ori_b','base_lin_vel','base_ang_vel','joint_pos','joint_vel','actions']
-    assert list(raw.observation_manager.active_terms['policy'])==expected,'Must use original standard task observations'
+    assert tuple(raw.observation_manager.group_obs_dim['policy'])==(154,)
+    expected=['command','motion_anchor_ori_b','base_ang_vel','joint_pos','joint_vel','actions']
+    assert list(raw.observation_manager.active_terms['policy'])==expected,'Must use original No-State-Estimation task observations'
+    assert raw.cfg.observations.policy.motion_anchor_pos_b is None
+    assert raw.cfg.observations.policy.base_lin_vel is None
     assert raw.action_manager.total_action_dim==29 and raw.cfg.episode_length_s==30.0
     from isaaclab.envs.mdp import undesired_contacts
     assert raw.cfg.rewards.undesired_contacts.func is undesired_contacts
@@ -32,20 +34,21 @@ def audit_environment(env):
     assert command.motion.time_step_total==1334 and command.motion.joint_pos.shape[1]==29
     assert command.motion._body_pos_w.shape[1]==42
     assert torch.isfinite(command.motion.joint_pos).all()
-    event('environment_constructed',num_envs=4096,tracked_bodies=14,recorded_bodies=42,actor_obs_dim=160,action_dim=29,episode_length_s=30,body_order_verified=True,motion_sha256=MOTION_SHA,reward_terms=list(raw.reward_manager.active_terms),baseline_rewards_preserved=True)
+    event('environment_constructed',num_envs=4096,tracked_bodies=14,recorded_bodies=42,actor_obs_dim=154,action_dim=29,episode_length_s=30,body_order_verified=True,motion_sha256=MOTION_SHA,reward_terms=list(raw.reward_manager.active_terms),baseline_rewards_preserved=True,state_estimation_inputs_removed=True)
 
 class BudgetReached(Exception):pass
 
 def run_bounded_training(runner,iterations,env,log_dir):
     import torch
     deadline=float(os.environ['KNEEL_SOFT_DEADLINE']);start=time.monotonic();updates=0
-    assert runner.current_learning_iteration==0,'Fresh training required; no checkpoint resume'
+    from kneel_resume import verify_restored_runner, SOURCE_UPDATES
+    resume_record=verify_restored_runner(runner)
     if deadline-start<30:raise RuntimeError('Startup consumed training budget')
     original=runner.log
     def bounded_log(locs,*args,**kwargs):
         nonlocal updates
         original(locs,*args,**kwargs);updates+=1
-        row={'iteration':int(locs['it']),'completed_updates':updates,'training_seconds':round(time.monotonic()-start,3)}
+        row={'iteration':int(locs['it']),'completed_updates':updates,'cumulative_completed_updates':SOURCE_UPDATES+updates,'training_seconds':round(time.monotonic()-start,3)}
         for key,value in locs.get('loss_dict',{}).items():row['loss/'+key]=float(value)
         for source,dest in [('collection_time','collection_seconds'),('learn_time','learning_seconds')]:
             row[dest]=float(locs[source])
@@ -61,7 +64,7 @@ def run_bounded_training(runner,iterations,env,log_dir):
         if updates==1 or updates%25==0:event('training_update_completed',**row)
         if time.monotonic()>=deadline:raise BudgetReached()
     runner.log=bounded_log
-    event('training_begin',fresh_training=True,soft_remaining_seconds=round(deadline-start,3),automatic_retries=0)
+    event('training_begin',fresh_training=False,soft_remaining_seconds=round(deadline-start,3),automatic_retries=0)
     reason='iteration_safety_ceiling'
     try:runner.learn(num_learning_iterations=iterations,init_at_random_ep_len=True)
     except BudgetReached:reason='worker_soft_deadline'
@@ -81,9 +84,9 @@ def run_bounded_training(runner,iterations,env,log_dir):
         export_policy_as_jit(policy,normalizer=normalizer,path=str(OUT),filename='policy.pt')
         export_policy_as_onnx(policy,normalizer=normalizer,path=str(OUT),filename='policy.onnx')
         saved=torch.jit.load(str(OUT/'policy.pt'),map_location='cpu').eval()
-        with torch.inference_mode():result=saved(torch.zeros(1,160))
+        with torch.inference_mode():result=saved(torch.zeros(1,154))
         assert result.shape==(1,29) and torch.isfinite(result).all()
-        event('policy_export_verified',input_dim=160,output_dim=29)
+        event('policy_export_verified',input_dim=154,output_dim=29)
     except Exception as exc:event('policy_export_failed',error_type=type(exc).__name__)
-    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':MOTION_SHA,'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),'checkpoint_bytes':checkpoint.stat().st_size,'num_envs':4096,'fresh_training':True,'actor_obs_dim':160,'action_dim':29,'episode_length_s':30,'dynamics_validated':False,'hardware_approved':False,'automatic_retries':0}
+    record={'completed_updates':updates,'cumulative_completed_updates':SOURCE_UPDATES+updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':MOTION_SHA,'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),'checkpoint_bytes':checkpoint.stat().st_size,'num_envs':4096,'fresh_training':False,'resume':resume_record,'actor_obs_dim':154,'action_dim':29,'episode_length_s':30,'dynamics_validated':False,'hardware_approved':False,'automatic_retries':0,'state_estimation_inputs_removed':True}
     (OUT/'completion.json').write_text(json.dumps(record,indent=2,allow_nan=False));event('checkpoint_saved',**record)

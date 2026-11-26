@@ -1,0 +1,36 @@
+{
+  "task": "LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation",
+  "expected_actor_dim": 154,
+  "prior_standard_actor_dim": 160,
+  "standard_term_dimensions": {
+    "command": 58,
+    "motion_anchor_pos_b": 3,
+    "motion_anchor_ori_b": 6,
+    "base_lin_vel": 3,
+    "base_ang_vel": 3,
+    "joint_pos": 29,
+    "joint_vel": 29,
+    "actions": 29
+  },
+  "removed_actor_terms": [
+    "motion_anchor_pos_b",
+    "base_lin_vel"
+  ],
+  "actor_terms": [
+    "command",
+    "motion_anchor_ori_b",
+    "base_ang_vel",
+    "joint_pos",
+    "joint_vel",
+    "actions"
+  ],
+  "critic_privileged_observations_preserved": true,
+  "original_subclass_post_init_executed_with_mocked_base": true,
+  "source_zip": "/workspace/shared_project/project.zip",
+  "descriptor_sha256": "b41bcc35f3813c7e2d7fe1fd6d3a5d4a420982c401e1e27f2caffc1c7d8ce2d3",
+  "fresh_training": true,
+  "reuse_standard_checkpoint": false,
+  "GPU_started": false,
+  "GPU_verified_for_this_profile": false,
+  "paid_launch_authorized": false
+}

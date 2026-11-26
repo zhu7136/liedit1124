@@ -1,0 +1,54 @@
+{
+  "checks": [
+    "original list_envs.py is included and integrity pinned",
+    "all 9 distinct absolute project-local imports resolve to delivered files",
+    "actual train.py/list_envs/cli_args/motion_args execute through task discovery and argument parsing to mocked AppLauncher boundary",
+    "all 5 discovered task registrations / 15 configuration entry-point symbols exist",
+    "offline installer imports hashlib and executes SHA256 without NameError"
+  ],
+  "passed": 5,
+  "distinct_local_imports": [
+    "cli_args",
+    "kneel_hooks",
+    "limx_rl_lab.assets.robots.limx",
+    "limx_rl_lab.tasks",
+    "limx_rl_lab.tasks.locomotion",
+    "limx_rl_lab.utils.export_deploy_cfg",
+    "list_envs",
+    "motion_args",
+    "offline_dependencies"
+  ],
+  "registered_task_count": 5,
+  "parsed_arguments": {
+    "video": false,
+    "video_length": 200,
+    "video_interval": 2000,
+    "num_envs": 4096,
+    "task": "LimX-HU-D04-01-Flat-BeyondMimic",
+    "seed": 42,
+    "max_iterations": 100000,
+    "init_checkpoint": null,
+    "distributed": false,
+    "motion_file": "/workspace/flux_playbook/fix2_verified_workload/motions/kneel_candidate/motion.npz",
+    "registry_name": null,
+    "experiment_name": "hud04_kneel_20261126",
+    "run_name": "fresh_standard_4096_60min",
+    "resume": false,
+    "load_run": null,
+    "checkpoint": null,
+    "logger": "tensorboard",
+    "log_project_name": null,
+    "headless": true,
+    "device": "cuda:0"
+  },
+  "mocked_boundaries": [
+    "gymnasium registration API",
+    "prettytable",
+    "argcomplete autocomplete",
+    "isaaclab.app.AppLauncher and its headless/device arguments"
+  ],
+  "real_isaac_tested": false,
+  "cuda_tested": false,
+  "training_started": false,
+  "dynamics_validated": false
+}

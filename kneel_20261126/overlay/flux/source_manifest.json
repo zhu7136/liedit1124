@@ -1,7 +1,7 @@
 {
   "flux/dependencies.json": "ac8c75308fca674ba8cad850de01e3b5d40ca6d2d096b7d4b3326e92e4014671",
   "flux/kneel_hooks.py": "95509ea9d9a3b628a0a156a01298bde25314b8d3e7dd7eced777b34f1ce1fd20",
-  "flux/kneel_worker.py": "a14a6c19dffbb33b0c5f579b986c9448e269ccbcbb9c88c55290781c3f085b5c",
+  "flux/kneel_worker.py": "9b5d540576081fa7ecf5684f969f7c0a2008d741414cd7967823fa6d842264a6",
   "flux/motion_order.json": "7450f9346e1ca090f7414e3f12022d6ffca01423eccc81d40433bb04354cd609",
   "flux/offline-wheel-manifest.json": "b7a761fca6deb1015594da0457a3b2f87cc64fc77a6add3d40347afd1b023d96",
   "flux/offline_dependencies.py": "1339ab5f409b6b17d89b52ea8a06b266869097a09884818507b2ae2c71b85240",

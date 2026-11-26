@@ -45,14 +45,14 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--expected-manifest-sha256',required=True);parser.add_argument('--expected-commit');parser.add_argument('--work-dir',type=Path)
     mode=parser.add_mutually_exclusive_group(required=True);mode.add_argument('--verify-only',action='store_true');mode.add_argument('--train',action='store_true');args=parser.parse_args();started=time.monotonic()
     def cutoff(*unused):event('source_delivery_deadline');os._exit(124)
-    signal.signal(signal.SIGALRM,cutoff);signal.alarm(3600 if args.train else 120)
+    signal.signal(signal.SIGALRM,cutoff);signal.alarm(600 if args.train else 120)
     if args.train:
         assert args.expected_commit and not args.work_dir
         actual=subprocess.run(['git','-C',str(ROOT),'rev-parse','HEAD'],capture_output=True,text=True,check=True,timeout=10).stdout.strip();assert actual==args.expected_commit,'Worker Git revision mismatch'
         subprocess.run(['git','-C',str(ROOT),'diff','--exit-code','HEAD','--','kneel_20261126','source-parts'],capture_output=True,check=True,timeout=15)
     destination=(args.work_dir or TRIAL/'verified-workload').resolve();d=restore(destination,args.expected_manifest_sha256)
     if args.verify_only:signal.alarm(0);return
-    assert d['worker_seconds']==3600 and d['automatic_retries']==0
+    assert d['worker_seconds']==600 and d['automatic_retries']==0
     os.environ.update(KNEEL_DELIVERY_STARTED=str(started),KNEEL_DELIVERY_SHA256=args.expected_manifest_sha256,KNEEL_COMMIT=args.expected_commit)
     entry=destination/'flux/kneel_worker.py';sys.argv=[str(entry)];runpy.run_path(str(entry),run_name='__main__')
 if __name__=='__main__':main()

@@ -2,7 +2,7 @@
 import argparse,hashlib,importlib.util,json,os,runpy,signal,subprocess,sys,time,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'outputs/kneel_training'
-WORKER_SECONDS=3600;SOFT_SECONDS=3420;CHILD_SECONDS=3540;STARTUP_SECONDS=600
+WORKER_SECONDS=600;SOFT_SECONDS=480;CHILD_SECONDS=570;STARTUP_SECONDS=420
 def event(kind,**kw):print(json.dumps({'event':kind,**kw}),flush=True)
 def kill_child(child):
     if child is not None and child.poll() is None:
@@ -22,10 +22,10 @@ def worker(started):
         assert path.is_file() and not path.is_symlink() and hashlib.sha256(path.read_bytes()).hexdigest()==wanted,'Source checksum: '+name
     from offline_dependencies import prepare_dependencies
     prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic','--motion_file',str(ROOT/'motions/kneel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','hud04_kneel_20261126','--run_name','fresh_standard_4096_60min','--logger','tensorboard','--headless','--device','cuda:0']
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic','--motion_file',str(ROOT/'motions/kneel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','2','--seed','42','--experiment_name','hud04_kneel_setup_check_20261126','--run_name','setup_check_standard_4096_max600s','--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 def archive_outputs(code,reason):
-    record={'child_exit_code':code,'parent_stop_reason':reason,'worker_seconds':3600,'automatic_retries':0,'completion_present':(OUT/'completion.json').is_file(),'commit':os.environ['KNEEL_COMMIT'],'delivery_sha256':os.environ['KNEEL_DELIVERY_SHA256']}
+    record={'child_exit_code':code,'parent_stop_reason':reason,'worker_seconds':WORKER_SECONDS,'setup_check_only':True,'maximum_ppo_iterations':2,'automatic_retries':0,'completion_present':(OUT/'completion.json').is_file(),'commit':os.environ['KNEEL_COMMIT'],'delivery_sha256':os.environ['KNEEL_DELIVERY_SHA256']}
     (OUT/'parent_result.json').write_text(json.dumps(record,indent=2))
     paths=[p for p in OUT.rglob('*') if p.is_file()]+[p for p in (ROOT/'logs').rglob('*') if p.is_file() and p.suffix not in ['.pt','.onnx','.pkl']]
     assert not any(p.is_symlink() for p in paths) and sum(p.stat().st_size for p in paths)<160*1024**2

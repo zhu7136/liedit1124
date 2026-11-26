@@ -1,5 +1,17 @@
 # HU-D04 kneel candidate — fresh standard-task delivery (2026-11-26)
 
+## CURRENT EXECUTION OVERRIDE: one setup check, maximum600s
+
+User authorized the proposed single1x4090D24GB setup check at2026-11-26T09:32:27Z.
+This revision uses worker600s inclusive of restore/init/save, soft480s,
+child cutoff570s and startup watchdog420s, maximum2 PPO iterations, zero retries.
+4096envs/seed42, original model, motion, standard task, rewards and physics remain
+unchanged. It is plumbing validation, NOT the one-hour training or a tracking
+quality result. No automatic continuation, fallback or second paid task is allowed.
+Allocation/clone/release billing overhead may exceed worker time; actual platform
+billing applies. Previous60min settings/authorization notes below are historical;
+this override and delivery.json govern this setup-check revision.
+
 ## Fix2: entry-import closure repair; NO new GPU launch authorized
 
 TASK_20261126_468 failed before simulation/PPO due to a missing `hashlib`

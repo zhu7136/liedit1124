@@ -1,0 +1,21 @@
+{
+  "passed": 12,
+  "checks": [
+    "all source hashes and Python syntax",
+    "every model and package source byte matches supplied ZIP",
+    "complete pinned offline wheel set",
+    "NPZ shapes dtypes preserved and first334 frames exactly unchanged",
+    "static final950-frame hold velocities",
+    "ACTUAL512 checkpoint actor154 critic286 optimizer17states and iter2021 restored using ACTUAL RSL-RL3.1.2 load method",
+    "actual restored model and optimizer take a CPU gradient update and save a resumed native checkpoint",
+    "bounded transport consumes private URL and validates exact real checkpoint bytes before runtime initialization",
+    "wrong checkpoint payload is rejected without writing or fresh fallback",
+    "unapproved transport target fails before any HTTP request",
+    "checkpoint verified before CUDA preflight and unchanged40minute hard2220soft2340child caps",
+    "motion input remains byte-identical to successful512 training"
+  ],
+  "actual512_checkpoint_tested": true,
+  "actual_rsl_rl_load_method_executed": true,
+  "GPU_tested": false,
+  "no_new_GPU_started": true
+}

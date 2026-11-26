@@ -1,4 +1,55 @@
-# HU-D04 kneel candidate — fresh standard-task delivery (2026-11-26)
+# Current fix1: explicit verified checkpoint transport
+
+One new40minute resume authorized2026-11-26T11:39:28Z. Prior538 terminated before resume/PPO because no exact checkpoint found at assumed mount. This branch uses explicit bounded HTTPS to the platform-returned signed checkpoint URL before GPU/environment initialization. Raw URL stays only in private Flux task command/in-memory process environment,NEVER committed or written to local task records/log archives. Checkpoint weights are NOT published in this public repository. Only its SHA and source identity are public. Download max60s/6724913bytes,exact SHA required,no redirect,retry or fresh fallback. CPU tests use the actual downloaded512 native actor154/critic286/optimizer checkpoint and actual RSL-RL3.1.2 load method. Native mount fields retained only for lineage,not consumed.
+
+---
+Historical setup notes below are superseded where different.
+
+# Current: NoSE154 resume512, one40minute worker
+
+Authorized2026-11-26T11:30:04Z. Single4090D24GB,4096envs,seed42. Native runner.load(load_optimizer=True), actor/critic/normalizers/optimizer/iter verification. Flux native mount only; source SHA234f686f8bad05b814921d2e60d5d8659ffa4c7ee7082f359d3de0d976a6f3fb. Fails closed if absent or mismatched; NEVER fresh fallback. Saved iteration2021,2022 completed updates in source; counters distinguish additional and cumulative updates. Environment and RNG reset; no exact trajectory continuity.
+
+Worker2400s including restore/init/save, soft2220s, child2340s,startup600s. Zero retry/continuation. Original model,motion,rewards,physics preserved. Motion dynamics/hardware NOT validated. Main untouched.
+
+---
+Historical notes below; settings overridden above.
+
+# HU-D04 kneel — No-State-Estimation,154-input fresh1h trial
+
+## ACTIVE AUTHORIZATION2026-11-26T10:02:08Z
+
+User explicitly requested immediate ONE formal one-hour GPU training attempt.
+1x4090D24GB,4096envs,seed42;fresh training with native
+`LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation`. Actor154/actions29;
+remove actor motion_anchor_pos_b and base_lin_vel, retain original privileged
+critic. No resume, no160-input checkpoint initialization, no automatic retry.
+
+Worker hard3600s includes source restoration/init/save; soft3420s, child3540s,
+startup watchdog600s. Iteration100000 is a safety ceiling, NOT the time limit;
+this is NOT the2-update setup check. Platform allocation/clone/release overhead
+can add actual billing time. No new GPU task beyond this single attempt is approved.
+
+Prior task502 validated the STANDARD160-input task only. The154-input profile
+has passed source/entry/argument/CPU regressions but awaits its own runtime
+observation audit on this trial; fail closed rather than substituting standard.
+Original USD/source package/motion/rewards/physics unchanged. Motion remains an
+unvalidated kneeling candidate, not a proven stable/hardware-safe four-contact
+motion; default knee-contact penalties remain. Do not infer task success from
+worker launch, training completion, checkpoint presence or policy export alone.
+
+Prior documentation below is retained as HISTORY; this section and delivery.json
+govern the new trial. Main and previous delivery branches must remain untouched.
+
+## CURRENT LOCAL PREPARATION: No-State-Estimation requested2026-11-26T09:54:14Z
+
+The active prepared task is `LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation`.
+Expected actor input154, not160: remove motion_anchor_pos_b(3) and base_lin_vel(3).
+Original privileged critic remains unchanged for asymmetric actor-critic training.
+Worker selection, runtime observation audit, export input and checkpoint metadata
+all target154. Original robot/source package/motion/rewards/physics unchanged.
+Fresh training only: never resume from the160-input setup checkpoint from task502.
+This profile has NOT been GPU tested, published or launched. No new paid launch
+is authorized. Earlier standard-task details below describe prior revisions only.
 
 ## Fix2: entry-import closure repair; NO new GPU launch authorized
 

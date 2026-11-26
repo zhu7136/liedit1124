@@ -1,0 +1,19 @@
+{
+  "passed": 10,
+  "checks": [
+    "all source hashes and Python syntax",
+    "every model and package source byte matches supplied ZIP",
+    "complete pinned offline wheel set",
+    "NPZ shapes dtypes preserved and first334 frames exactly unchanged",
+    "static final950-frame hold velocities",
+    "actor critic normalizers optimizer tensors groups LR and2021 iteration restore verified at mocked native runner boundary",
+    "bounded resumed update produces native checkpoint and correct additional/cumulative counters",
+    "missing optimizer state wrong iteration changed model all fail closed",
+    "mismatched or absent source checkpoint never falls back to fresh training",
+    "explicit native resume optimizer flag forty-minute caps and unchanged motion"
+  ],
+  "GPU_tested": false,
+  "source_checkpoint_downloaded_in_sandbox": false,
+  "Flux_native_mount_pending_runtime_verification": true,
+  "no_GPU_started": true
+}

@@ -1,0 +1,14 @@
+{
+  "source_task": "TASK_20261126_542",
+  "source_commit": "325e3ba397440e6e183b69391b8966f3710cd078",
+  "original_descriptor_sha256": "3740a371e5b29e1e3f61a7cfbc632541f98fa6dc53e243e8ad21a3b7b3dca9f9",
+  "worker_limit_seconds": 240,
+  "total_gpu_budget_seconds": 300,
+  "training_updates": 0,
+  "automatic_retries": 0,
+  "authorization_utc": "2026-11-26T13:57:46Z",
+  "entry_files": {
+    "launch.py": "e395f2edf850b03741c8b57eac65c70ff806d33cd9f43b59a48228932c41cd86",
+    "export_hooks.py": "2a5a74a391a816c4e3a9a5b4621ea1b4d36d071576475e5b8468640bffd4411b"
+  }
+}

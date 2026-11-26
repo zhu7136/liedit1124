@@ -1,0 +1,14 @@
+{
+  "passed": 5,
+  "checks": [
+    "all referenced installer globals are defined",
+    "install_all_missing",
+    "already_present",
+    "pip_failure",
+    "no_cuda"
+  ],
+  "actual_23_wheel_hashes_checked": true,
+  "pip_and_gpu_mocked": true,
+  "real_gpu_validated": false,
+  "online_install_attempted": false
+}

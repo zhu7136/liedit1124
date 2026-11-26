@@ -1,5 +1,20 @@
 # HU-D04 kneel candidate — fresh standard-task delivery (2026-11-26)
 
+## Corrected revision / one additional attempt authorized 2026-11-26T09:03:46Z
+
+Prior task TASK_20261126_468 failed BEFORE simulation/PPO because the extracted
+offline installer lacked `import hashlib`. This revision fixes that import and
+regenerates BOTH integrity manifests. Actual installer execution now has CPU
+regression coverage for all referenced globals, all23 real wheel hashes,
+install-all-missing, already-present, pip-failure, and no-CUDA rejection paths.
+Image/pip/CUDA boundaries in those CPU tests are MOCKED; real GPU readiness is
+not established until runtime_preflight_verified and actual PPO update events.
+
+User explicitly approved ONE additional single4090D24GB attempt, worker<=3600s,
+zero automatic retries, accepting platform actual billing. Same original motion,
+standard task,4096envs,seed42,physics/rewards/limits. No extra GPU smoke task is
+created. Main, original delivery branch and failed task remain unchanged.
+
 This directory is the ONLY entry for this trial. The historical root launch.py,
 README, source-overlay, tasks, checkpoints and authorizations do not describe it
 and MUST NOT be executed for this trial. Main is not modified.

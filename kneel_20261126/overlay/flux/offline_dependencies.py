@@ -1,4 +1,4 @@
-import importlib.metadata,importlib.util,json,os,subprocess,sys
+import hashlib,importlib.metadata,importlib.util,json,os,subprocess,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 def event(event_type,**kw):print(json.dumps({"event":event_type,**kw}),flush=True)

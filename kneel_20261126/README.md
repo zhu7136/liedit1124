@@ -1,10 +1,10 @@
-# Normal23000 final-hold action-rate trial
+# Upright-reference-only warm start
 
 {
-  "authorized_utc": "2026-11-27T11:32:31Z",
+  "authorized_utc": "2026-11-27T14:27:35Z",
   "source_iteration": 23000,
   "checkpoint_sha256": "e9bf8d19b21354f5993f335ad57fcc235c76ebb9aa9e27c7d6305b95b0ee94b5",
-  "motion_sha256": "c6302553ea3fa923013c0b36618bde25f0bcb5d6da2f58cedb802a8bd4c02393",
+  "motion_sha256": "95603a5949b63d978300c3e9c9d893ecd322909b11c6cffbc8b7418073378dca",
   "original_normal_source_files": [
     "source/limx_rl_lab/limx_rl_lab/__init__.py",
     "source/limx_rl_lab/limx_rl_lab/tasks/__init__.py",
@@ -31,19 +31,21 @@
   "new_gpu_jobs": 1,
   "automatic_retries": 0,
   "episode_length_s": 10.0,
-  "changed_reward": {
-    "term": "final_hold_action_rate_l2",
-    "additional_weight": -0.1,
-    "existing_global_weight": -0.1,
-    "effective_final_hold_weight": -0.2,
-    "gate": "reference frame>=334 and max abs reference joint velocity<1e-6"
-  },
+  "changed_reward": null,
   "optimizer_reset": true,
   "normalization": "identity, verified from source checkpoint",
   "original_kd_preserved": true,
-  "hardware_approved": false
+  "hardware_approved": false,
+  "extra_final_hold_action_rate_weight": 0.0,
+  "final_hold_start_frame": 434,
+  "transition_frames": [
+    334,
+    434
+  ],
+  "hypothesis": "Changing only the consistent 42-body reference can teach upright hold while preserving the original opening motion.",
+  "native_preflight_steps": 100,
+  "preflight_quality_acceptance": false,
+  "render_mp4": false
 }
 
-One native Isaac GPU attempt, no automatic retry. No hardware approval. Original actor/critic strictly initialized; optimizer reset. Preserve original normal333 reference, episode10s, NoSE154/critic286,29actions and Kd. Only added reward final-hold action-rate weight-0.1. Main and previous strategies untouched.
-
-Checkpoint weights are NOT in this public source tree. Task receives an expiring private input URL only through its private launch command; no URL in Git, output archives or local task records. The90s download verifies exact archive and checkpoint SHA256 before native initialization; zero redirects/retries.
+One existing Flux native Isaac worker. Strict original23000 weights, fresh optimizer, baseline reward/PD/native USD unchanged. Max1800s including initialization/preflight/archive,1000 updates,no retry,no MP4,no real-hardware approval. Original files and main untouched. Preflight checks native runtime compatibility, not successful upright control. Output contains intermediate checkpoints for later complete-motion evaluation.

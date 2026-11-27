@@ -3,7 +3,7 @@ import hashlib,json
 from pathlib import Path
 import torch
 ROOT=Path(__file__).resolve().parents[1]
-HOLD_START_FRAME=334
+HOLD_START_FRAME=434
 SOURCE_ITERATION=23000
 
 def hold_action_rate_l2(env, command_name='motion', start_frame=HOLD_START_FRAME):
@@ -16,7 +16,8 @@ def configure_hold_trial(env_cfg,agent_cfg):
     from isaaclab.managers import RewardTermCfg
     assert env_cfg.episode_length_s==10.0
     assert env_cfg.rewards.action_rate_l2.weight==-0.1
-    env_cfg.rewards.final_hold_action_rate_l2=RewardTermCfg(func=hold_action_rate_l2,weight=-0.1,params={'command_name':'motion','start_frame':HOLD_START_FRAME})
+    # Reference-only first trial: preserve original rewards, no extra hold penalty.
+    assert not hasattr(env_cfg.rewards, 'final_hold_action_rate_l2')
     # The source checkpoint has no normalization buffers. Explicit False keeps
     # the same identity normalization; never create uninitialized normalizers.
     agent_cfg.policy.actor_obs_normalization=False

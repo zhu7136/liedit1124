@@ -3,7 +3,7 @@ import hashlib,json,math,os,shutil,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'outputs/kneel_training'
-MOTION_SHA='c6302553ea3fa923013c0b36618bde25f0bcb5d6da2f58cedb802a8bd4c02393'
+MOTION_SHA='95603a5949b63d978300c3e9c9d893ecd322909b11c6cffbc8b7418073378dca'
 def event(kind,**kw):
     row={'event':kind,'elapsed_seconds':round(time.monotonic()-float(os.environ['KNEEL_STARTED']),3),**kw}
     OUT.mkdir(parents=True,exist_ok=True)
@@ -47,13 +47,13 @@ def audit_environment(env):
     assert command.motion._body_pos_w.shape[1]==42
     assert torch.isfinite(command.motion.joint_pos).all()
     assert tuple(raw.observation_manager.group_obs_dim['critic'])==(286,)
-    assert raw.cfg.rewards.final_hold_action_rate_l2.weight==-0.1
+    assert not hasattr(raw.cfg.rewards, 'final_hold_action_rate_l2')
     assert raw.cfg.rewards.action_rate_l2.weight==-0.1
-    assert 'final_hold_action_rate_l2' in raw.reward_manager.active_terms
-    assert command.motion.joint_vel[334:].abs().max()<1e-6
-    assert command.motion._body_ang_vel_w[334:].abs().max()<1e-6
-    assert command.motion._body_lin_vel_w[334:].abs().max()<1e-6
-    event('environment_constructed',num_envs=4096,tracked_bodies=14,recorded_bodies=42,actor_obs_dim=154,action_dim=29,episode_length_s=10,body_order_verified=True,motion_sha256=MOTION_SHA,reward_terms=list(raw.reward_manager.active_terms),baseline_rewards_preserved=True,extra_final_hold_action_rate_weight=-0.1,state_estimation_inputs_removed=True,all_self_collisions_disabled=True,fresh_training=False,source_iteration=23000,optimizer_reset=True)
+    assert 'final_hold_action_rate_l2' not in raw.reward_manager.active_terms
+    assert command.motion.joint_vel[434:].abs().max()<1e-6
+    assert command.motion._body_ang_vel_w[434:].abs().max()<1e-6
+    assert command.motion._body_lin_vel_w[434:].abs().max()<1e-6
+    event('environment_constructed',num_envs=4096,tracked_bodies=14,recorded_bodies=42,actor_obs_dim=154,action_dim=29,episode_length_s=10,body_order_verified=True,motion_sha256=MOTION_SHA,reward_terms=list(raw.reward_manager.active_terms),baseline_rewards_preserved=True,extra_final_hold_action_rate_weight=0.0,final_hold_start_frame=434,transition_start_frame=334,reference_kind="upright_kinematic_candidate",state_estimation_inputs_removed=True,all_self_collisions_disabled=True,fresh_training=False,source_iteration=23000,optimizer_reset=True)
 
 class BudgetReached(Exception):pass
 
@@ -62,6 +62,8 @@ def run_bounded_training(runner,iterations,env,log_dir):
     deadline=float(os.environ['KNEEL_SOFT_DEADLINE']);start=time.monotonic();updates=0
     assert runner.current_learning_iteration==0 and getattr(runner,'_normal23000_warm_start_verified',False), 'Strict normal23000 weights must be loaded before PPO'
     if deadline-start<30:raise RuntimeError('Startup consumed training budget')
+    from upright_preflight import native_preflight
+    native_preflight(runner,env,event,OUT)
     original=runner.log
     def bounded_log(locs,*args,**kwargs):
         nonlocal updates
@@ -95,6 +97,10 @@ def run_bounded_training(runner,iterations,env,log_dir):
         candidates=[Path(log_dir)/'params'/name,Path(log_dir)/name]
         for source in candidates:
             if source.is_file():shutil.copy2(source,OUT/name);break
+    # Retain every 100-update checkpoint in the archived output for selection.
+    saved_dir=OUT/'checkpoints';saved_dir.mkdir(exist_ok=True)
+    for saved in sorted(Path(log_dir).glob('model_*.pt')):
+        shutil.copy2(saved,saved_dir/saved.name)
     # Export failure does not invalidate an already-saved native training checkpoint.
     try:
         from isaaclab_rl.rsl_rl import export_policy_as_jit,export_policy_as_onnx
@@ -106,5 +112,5 @@ def run_bounded_training(runner,iterations,env,log_dir):
         assert result.shape==(1,29) and torch.isfinite(result).all()
         event('policy_export_verified',input_dim=154,output_dim=29)
     except Exception as exc:event('policy_export_failed',error_type=type(exc).__name__)
-    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':MOTION_SHA,'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),'checkpoint_bytes':checkpoint.stat().st_size,'num_envs':4096,'fresh_training':False,'source_iteration':23000,'optimizer_reset':True,'all_self_collisions_disabled':True,'motion_artifact':'original333/motion_1_333_hold.npz (normal reference, not deep-kneel candidate)','actor_obs_dim':154,'action_dim':29,'episode_length_s':10,'dynamics_validated':False,'hardware_approved':False,'automatic_retries':0,'state_estimation_inputs_removed':True}
+    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':MOTION_SHA,'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),'checkpoint_bytes':checkpoint.stat().st_size,'num_envs':4096,'fresh_training':False,'source_iteration':23000,'optimizer_reset':True,'all_self_collisions_disabled':True,'motion_artifact':'upright-hold-reference-kinematic-candidate:v0','actor_obs_dim':154,'action_dim':29,'episode_length_s':10,'dynamics_validated':False,'hardware_approved':False,'automatic_retries':0,'state_estimation_inputs_removed':True}
     (OUT/'completion.json').write_text(json.dumps(record,indent=2,allow_nan=False));event('checkpoint_saved',**record)

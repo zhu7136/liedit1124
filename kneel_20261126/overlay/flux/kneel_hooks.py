@@ -3,7 +3,7 @@ import hashlib,json,math,os,shutil,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'outputs/kneel_training'
-MOTION_SHA='12ceddb49bf5e8a795dc69f8132853d86655ec7126524cea6d166be0714c3714'
+MOTION_SHA='c6302553ea3fa923013c0b36618bde25f0bcb5d6da2f58cedb802a8bd4c02393'
 def event(kind,**kw):
     row={'event':kind,'elapsed_seconds':round(time.monotonic()-float(os.environ['KNEEL_STARTED']),3),**kw}
     OUT.mkdir(parents=True,exist_ok=True)
@@ -25,7 +25,7 @@ def audit_environment(env):
     assert list(raw.observation_manager.active_terms['policy'])==expected,'Must use original No-State-Estimation task observations'
     assert raw.cfg.observations.policy.motion_anchor_pos_b is None
     assert raw.cfg.observations.policy.base_lin_vel is None
-    assert raw.action_manager.total_action_dim==29 and raw.cfg.episode_length_s==30.0
+    assert raw.action_manager.total_action_dim==29 and raw.cfg.episode_length_s==10.0
     from isaaclab.envs.mdp import undesired_contacts
     assert raw.cfg.rewards.undesired_contacts.func is undesired_contacts
     assert not hasattr(raw.cfg.rewards,'hold_torso_upright') and not hasattr(raw.cfg.rewards,'hold_four_support')
@@ -46,14 +46,21 @@ def audit_environment(env):
     assert command.motion.time_step_total==1334 and command.motion.joint_pos.shape[1]==29
     assert command.motion._body_pos_w.shape[1]==42
     assert torch.isfinite(command.motion.joint_pos).all()
-    event('environment_constructed',num_envs=4096,tracked_bodies=14,recorded_bodies=42,actor_obs_dim=154,action_dim=29,episode_length_s=30,body_order_verified=True,motion_sha256=MOTION_SHA,reward_terms=list(raw.reward_manager.active_terms),baseline_rewards_preserved=True,state_estimation_inputs_removed=True,all_self_collisions_disabled=True,fresh_training=True)
+    assert tuple(raw.observation_manager.group_obs_dim['critic'])==(286,)
+    assert raw.cfg.rewards.final_hold_action_rate_l2.weight==-0.1
+    assert raw.cfg.rewards.action_rate_l2.weight==-0.1
+    assert 'final_hold_action_rate_l2' in raw.reward_manager.active_terms
+    assert command.motion.joint_vel[334:].abs().max()<1e-6
+    assert command.motion._body_ang_vel_w[334:].abs().max()<1e-6
+    assert command.motion._body_lin_vel_w[334:].abs().max()<1e-6
+    event('environment_constructed',num_envs=4096,tracked_bodies=14,recorded_bodies=42,actor_obs_dim=154,action_dim=29,episode_length_s=10,body_order_verified=True,motion_sha256=MOTION_SHA,reward_terms=list(raw.reward_manager.active_terms),baseline_rewards_preserved=True,extra_final_hold_action_rate_weight=-0.1,state_estimation_inputs_removed=True,all_self_collisions_disabled=True,fresh_training=False,source_iteration=23000,optimizer_reset=True)
 
 class BudgetReached(Exception):pass
 
 def run_bounded_training(runner,iterations,env,log_dir):
     import torch
     deadline=float(os.environ['KNEEL_SOFT_DEADLINE']);start=time.monotonic();updates=0
-    assert runner.current_learning_iteration==0,'Fresh training required; no checkpoint resume'
+    assert runner.current_learning_iteration==0 and getattr(runner,'_normal23000_warm_start_verified',False), 'Strict normal23000 weights must be loaded before PPO'
     if deadline-start<30:raise RuntimeError('Startup consumed training budget')
     original=runner.log
     def bounded_log(locs,*args,**kwargs):
@@ -75,7 +82,7 @@ def run_bounded_training(runner,iterations,env,log_dir):
         if updates==1 or updates%25==0:event('training_update_completed',**row)
         if time.monotonic()>=deadline:raise BudgetReached()
     runner.log=bounded_log
-    event('training_begin',fresh_training=True,soft_remaining_seconds=round(deadline-start,3),automatic_retries=0)
+    event('training_begin',fresh_training=False,source_iteration=23000,optimizer_reset=True,soft_remaining_seconds=round(deadline-start,3),automatic_retries=0)
     reason='iteration_safety_ceiling'
     try:runner.learn(num_learning_iterations=iterations,init_at_random_ep_len=True)
     except BudgetReached:reason='worker_soft_deadline'
@@ -99,5 +106,5 @@ def run_bounded_training(runner,iterations,env,log_dir):
         assert result.shape==(1,29) and torch.isfinite(result).all()
         event('policy_export_verified',input_dim=154,output_dim=29)
     except Exception as exc:event('policy_export_failed',error_type=type(exc).__name__)
-    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':MOTION_SHA,'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),'checkpoint_bytes':checkpoint.stat().st_size,'num_envs':4096,'fresh_training':True,'all_self_collisions_disabled':True,'motion_artifact':'zhul136-university-of-science-and-technology-of-china/motion-edits/kneel-hold-reference-candidate:v0','actor_obs_dim':154,'action_dim':29,'episode_length_s':30,'dynamics_validated':False,'hardware_approved':False,'automatic_retries':0,'state_estimation_inputs_removed':True}
+    record={'completed_updates':updates,'last_iteration':int(runner.current_learning_iteration),'training_seconds':round(time.monotonic()-start,3),'stop_reason':reason,'motion_sha256':MOTION_SHA,'checkpoint_sha256':hashlib.sha256(checkpoint.read_bytes()).hexdigest(),'checkpoint_bytes':checkpoint.stat().st_size,'num_envs':4096,'fresh_training':False,'source_iteration':23000,'optimizer_reset':True,'all_self_collisions_disabled':True,'motion_artifact':'original333/motion_1_333_hold.npz (normal reference, not deep-kneel candidate)','actor_obs_dim':154,'action_dim':29,'episode_length_s':10,'dynamics_validated':False,'hardware_approved':False,'automatic_retries':0,'state_estimation_inputs_removed':True}
     (OUT/'completion.json').write_text(json.dumps(record,indent=2,allow_nan=False));event('checkpoint_saved',**record)

@@ -2,7 +2,7 @@
 import argparse,hashlib,importlib.util,json,os,runpy,signal,subprocess,sys,time,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'outputs/kneel_training'
-WORKER_SECONDS=5400;SOFT_SECONDS=5220;CHILD_SECONDS=5340;STARTUP_SECONDS=600
+WORKER_SECONDS=1800;SOFT_SECONDS=1620;CHILD_SECONDS=1740;STARTUP_SECONDS=600
 def event(kind,**kw):print(json.dumps({'event':kind,**kw}),flush=True)
 def kill_child(child):
     if child is not None and child.poll() is None:
@@ -21,11 +21,12 @@ def worker(started):
         path=ROOT/name
         assert path.is_file() and not path.is_symlink() and hashlib.sha256(path.read_bytes()).hexdigest()==wanted,'Source checksum: '+name
     from offline_dependencies import prepare_dependencies
-    prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/kneel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','100000','--seed','42','--experiment_name','hud04_kneel_selfcollisionOFF_20261127','--run_name','fresh_nose154_selfcollisionOFF_4096_90min','--logger','tensorboard','--headless','--device','cuda:0']
+    from normal23000_checkpoint_http import ensure_checkpoint
+    ensure_checkpoint();prepare_dependencies();os.chdir(ROOT)
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/kneel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','1000','--seed','42','--experiment_name','hud04_normal23000_finalhold_20261127','--run_name','warm23000_hold_actionrate02_4096_max30min','--init_checkpoint',str(ROOT/'inputs/normal_model_23000.pt'),'--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 def archive_outputs(code,reason):
-    record={'child_exit_code':code,'parent_stop_reason':reason,'worker_seconds':5400,'automatic_retries':0,'completion_present':(OUT/'completion.json').is_file(),'commit':os.environ['KNEEL_COMMIT'],'delivery_sha256':os.environ['KNEEL_DELIVERY_SHA256']}
+    record={'child_exit_code':code,'parent_stop_reason':reason,'worker_seconds':1800,'automatic_retries':0,'completion_present':(OUT/'completion.json').is_file(),'commit':os.environ['KNEEL_COMMIT'],'delivery_sha256':os.environ['KNEEL_DELIVERY_SHA256']}
     (OUT/'parent_result.json').write_text(json.dumps(record,indent=2))
     paths=[p for p in OUT.rglob('*') if p.is_file()]+[p for p in (ROOT/'logs').rglob('*') if p.is_file() and p.suffix not in ['.pt','.onnx','.pkl']]
     assert not any(p.is_symlink() for p in paths) and sum(p.stat().st_size for p in paths)<160*1024**2
@@ -50,7 +51,7 @@ def main():
         launcher=next((str(x) for x in [Path('/isaac-sim/python.sh'),Path('/workspace/isaaclab/_isaac_sim/python.sh')] if x.is_file() and os.access(x,os.X_OK)),None)
         if launcher is None:
             assert sys.version_info[:2]==(3,11),'No supported Isaac Python3.11 runtime';launcher=sys.executable
-        event('worker_begin',worker_seconds=WORKER_SECONDS,soft_seconds=SOFT_SECONDS,startup_seconds=STARTUP_SECONDS,fresh_training=True,num_envs=4096,automatic_retries=0,commit=os.environ['KNEEL_COMMIT'],task='LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation')
+        event('worker_begin',worker_seconds=WORKER_SECONDS,soft_seconds=SOFT_SECONDS,startup_seconds=STARTUP_SECONDS,fresh_training=False,source_iteration=23000,optimizer_reset=True,num_envs=4096,automatic_retries=0,commit=os.environ['KNEEL_COMMIT'],task='LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation')
         logpath=OUT/'native.log'
         with logpath.open('x') as log:
             child=subprocess.Popen([launcher,str(Path(__file__).resolve()),'--runtime-child','--started',str(started)],stdout=log,stderr=subprocess.STDOUT,env=dict(os.environ,PYTHONUNBUFFERED='1'),start_new_session=True)

@@ -1,5 +1,49 @@
-# Fresh NoSE154 kneeling: all self collisions OFF
+# Normal23000 final-hold action-rate trial
 
-User authorized 2026-11-27T07:32:49Z. One4090D24GB,4096envs,seed42. Fresh training, no checkpoint init/resume. Motion zhul136-university-of-science-and-technology-of-china/motion-edits/kneel-hold-reference-candidate:v0 SHA256 12ceddb49bf5e8a795dc69f8132853d86655ec7126524cea6d166be0714c3714.
+{
+  "authorized_utc": "2026-11-27T11:32:31Z",
+  "source_iteration": 23000,
+  "checkpoint_sha256": "e9bf8d19b21354f5993f335ad57fcc235c76ebb9aa9e27c7d6305b95b0ee94b5",
+  "motion_sha256": "c6302553ea3fa923013c0b36618bde25f0bcb5d6da2f58cedb802a8bd4c02393",
+  "original_normal_source_files": [
+    "source/limx_rl_lab/limx_rl_lab/__init__.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/__init__.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/__init__.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/beyondmimic_env_cfg.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/agents/__init__.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/agents/rsl_rl_ppo_cfg.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/robots/__init__.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/mdp/__init__.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/mdp/observations.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/mdp/events.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/mdp/terminations.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/mdp/commands.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/mdp/rewards.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/robots/limx/robot_cfg.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/robots/limx/__init__.py",
+    "source/limx_rl_lab/limx_rl_lab/tasks/beyondmimic/robots/limx/flat_env_cfg.py"
+  ],
+  "worker_seconds": 1800,
+  "soft_seconds": 1620,
+  "child_seconds": 1740,
+  "startup_seconds": 600,
+  "maximum_additional_ppo_updates": 1000,
+  "new_gpu_jobs": 1,
+  "automatic_retries": 0,
+  "episode_length_s": 10.0,
+  "changed_reward": {
+    "term": "final_hold_action_rate_l2",
+    "additional_weight": -0.1,
+    "existing_global_weight": -0.1,
+    "effective_final_hold_weight": -0.2,
+    "gate": "reference frame>=334 and max abs reference joint velocity<1e-6"
+  },
+  "optimizer_reset": true,
+  "normalization": "identity, verified from source checkpoint",
+  "original_kd_preserved": true,
+  "hardware_approved": false
+}
 
-GPU worker limit5400s including init/save, soft5220, child5340, startup600. Zero retries/continuations. Baseline rewards, PD, observations, motion and episode30s unchanged. Disables ALL self collisions BEFORE environment construction and verifies USD attribute on env0 articulation before PPO. Ground contact stays enabled. Motion not dynamics/hardware validated. Separate additive branch; main and previous policy files untouched.
+One native Isaac GPU attempt, no automatic retry. No hardware approval. Original actor/critic strictly initialized; optimizer reset. Preserve original normal333 reference, episode10s, NoSE154/critic286,29actions and Kd. Only added reward final-hold action-rate weight-0.1. Main and previous strategies untouched.
+
+Checkpoint weights are NOT in this public source tree. Task receives an expiring private input URL only through its private launch command; no URL in Git, output archives or local task records. The90s download verifies exact archive and checkpoint SHA256 before native initialization; zero redirects/retries.

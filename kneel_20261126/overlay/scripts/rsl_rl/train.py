@@ -136,38 +136,8 @@ torch.backends.cudnn.benchmark = False
 
 
 def load_init_checkpoint(runner: OnPolicyRunner, checkpoint_path: str):
-    """Load matching actor-critic weights from a checkpoint for warm-start finetuning."""
-    loaded_dict = torch.load(checkpoint_path, map_location="cpu")
-    model_state_dict = loaded_dict.get("model_state_dict", loaded_dict)
-    if not isinstance(model_state_dict, dict):
-        raise ValueError(f"Checkpoint at {checkpoint_path} does not contain a model state dict.")
-
-    policy = getattr(runner.alg, "policy", None)
-    if policy is None:
-        policy = getattr(runner.alg, "actor_critic", None)
-    if policy is None:
-        raise AttributeError("Unable to locate policy module on runner.alg for warm-start loading.")
-
-    current_state_dict = policy.state_dict()
-    matched_state_dict = {}
-    skipped_keys = []
-
-    for key, value in model_state_dict.items():
-        if key in current_state_dict and current_state_dict[key].shape == value.shape:
-            matched_state_dict[key] = value
-        else:
-            skipped_keys.append(key)
-
-    policy.load_state_dict(matched_state_dict, strict=False)
-
-    print(
-        "[INFO]: Warm-started actor-critic with "
-        f"{len(matched_state_dict)} matched tensors; skipped {len(skipped_keys)} mismatched tensors."
-    )
-    if skipped_keys:
-        preview = ", ".join(skipped_keys[:8])
-        suffix = "..." if len(skipped_keys) > 8 else ""
-        print(f"[INFO]: Skipped checkpoint tensors: {preview}{suffix}")
+    from hold_runtime import strict_warm_start
+    strict_warm_start(runner,checkpoint_path)
 
 
 @hydra_task_config(args_cli.task, "rsl_rl_cfg_entry_point")
@@ -184,10 +154,12 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     env_cfg.scene.terrain.visual_material = None
     env_cfg.commands.motion.debug_vis = False
     env_cfg.scene.contact_forces.debug_vis = False
-    env_cfg.episode_length_s = 30.0
+    assert env_cfg.episode_length_s == 10.0, 'Preserve normal23000 episode length'
+    from hold_runtime import configure_hold_trial
+    configure_hold_trial(env_cfg,agent_cfg)
     env_cfg.scene.robot.spawn.articulation_props.enabled_self_collisions = False
     agent_cfg.resume = False
-    assert not args_cli.resume and args_cli.init_checkpoint is None, "Fresh training only"
+    assert not args_cli.resume and args_cli.init_checkpoint is not None, "Strict normal23000 warm start required"
     agent_cfg.save_interval = 100
 
     # set the environment seed

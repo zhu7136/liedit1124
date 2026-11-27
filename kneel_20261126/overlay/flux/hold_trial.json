@@ -1,5 +1,5 @@
 {
-  "authorized_utc": "2026-11-27T14:27:35Z",
+  "authorized_utc": "2026-11-27T16:03:14Z",
   "source_iteration": 23000,
   "checkpoint_sha256": "e9bf8d19b21354f5993f335ad57fcc235c76ebb9aa9e27c7d6305b95b0ee94b5",
   "motion_sha256": "95603a5949b63d978300c3e9c9d893ecd322909b11c6cffbc8b7418073378dca",
@@ -43,5 +43,10 @@
   "hypothesis": "Changing only the consistent 42-body reference can teach upright hold while preserving the original opening motion.",
   "native_preflight_steps": 100,
   "preflight_quality_acceptance": false,
-  "render_mp4": false
+  "render_mp4": false,
+  "previous_failed_task": "TASK_20261127_767",
+  "preflight_fix": "torch.no_grad for native simulation, not torch.inference_mode",
+  "preflight_fix_cpu_regression_passed": true,
+  "native_fix_verified": false,
+  "actual_deploy_yaml_embedded_in_final_checkpoint": true
 }

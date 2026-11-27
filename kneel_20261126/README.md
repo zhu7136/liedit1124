@@ -1,7 +1,7 @@
-# Upright-reference-only warm start
+# Newly authorized native preflight fix and upright reference warm-start
 
 {
-  "authorized_utc": "2026-11-27T14:27:35Z",
+  "authorized_utc": "2026-11-27T16:03:14Z",
   "source_iteration": 23000,
   "checkpoint_sha256": "e9bf8d19b21354f5993f335ad57fcc235c76ebb9aa9e27c7d6305b95b0ee94b5",
   "motion_sha256": "95603a5949b63d978300c3e9c9d893ecd322909b11c6cffbc8b7418073378dca",
@@ -45,7 +45,12 @@
   "hypothesis": "Changing only the consistent 42-body reference can teach upright hold while preserving the original opening motion.",
   "native_preflight_steps": 100,
   "preflight_quality_acceptance": false,
-  "render_mp4": false
+  "render_mp4": false,
+  "previous_failed_task": "TASK_20261127_767",
+  "preflight_fix": "torch.no_grad for native simulation, not torch.inference_mode",
+  "preflight_fix_cpu_regression_passed": true,
+  "native_fix_verified": false,
+  "actual_deploy_yaml_embedded_in_final_checkpoint": true
 }
 
-One existing Flux native Isaac worker. Strict original23000 weights, fresh optimizer, baseline reward/PD/native USD unchanged. Max1800s including initialization/preflight/archive,1000 updates,no retry,no MP4,no real-hardware approval. Original files and main untouched. Preflight checks native runtime compatibility, not successful upright control. Output contains intermediate checkpoints for later complete-motion evaluation.
+One1x4090D24GB, native Isaac,1800s worker limit including startup/preflight/save,1000PPO updates,no retry,no MP4. Original23000 weights, original rewards/PD/native physics preserved. Main and all prior trials untouched. Fix no_grad preflight then env.reset; abort if failed. Embed actual same-run deploy.yaml in final checkpoint for recoverable paired delivery. Private checkpoint transport, no weights or secrets in Git. No hardware approval.

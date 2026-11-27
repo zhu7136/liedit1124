@@ -97,6 +97,23 @@ def run_bounded_training(runner,iterations,env,log_dir):
         candidates=[Path(log_dir)/'params'/name,Path(log_dir)/name]
         for source in candidates:
             if source.is_file():shutil.copy2(source,OUT/name);break
+    # Embed actual native configuration in the final checkpoint, so YAML is recoverable
+    # from the platform's confirmed model download path, not only chart archives.
+    native_deploy=OUT/'deploy.yaml'
+    assert native_deploy.is_file(), 'Actual same-run deploy.yaml required for delivery'
+    payload=torch.load(checkpoint,map_location='cpu',weights_only=False)
+    metadata={'format':'hud04_native_deploy_metadata_v1','deploy_yaml_utf8':native_deploy.read_text(),
+              'deploy_yaml_sha256':hashlib.sha256(native_deploy.read_bytes()).hexdigest(),
+              'motion_sha256':MOTION_SHA,'completed_updates':updates,'source_iteration':23000,
+              'actor_obs_dim':154,'critic_obs_dim':286,'actions':29,
+              'code_commit':os.environ['KNEEL_COMMIT'],'yaml_origin':'actual same-run native export',
+              'preflight_passed':True,'no_mp4':True,'hardware_approved':False}
+    payload['deployment_metadata']=metadata
+    torch.save(payload,checkpoint)
+    torch.save(metadata,OUT/'native_deploy_metadata.pt')
+    check=torch.load(checkpoint,map_location='cpu',weights_only=False)['deployment_metadata']
+    assert hashlib.sha256(check['deploy_yaml_utf8'].encode()).hexdigest()==metadata['deploy_yaml_sha256']
+    event('native_deploy_metadata_embedded',deploy_yaml_sha256=metadata['deploy_yaml_sha256'],completed_updates=updates)
     # Retain every 100-update checkpoint in the archived output for selection.
     saved_dir=OUT/'checkpoints';saved_dir.mkdir(exist_ok=True)
     for saved in sorted(Path(log_dir).glob('model_*.pt')):

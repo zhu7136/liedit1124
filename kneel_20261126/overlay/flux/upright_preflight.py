@@ -16,7 +16,7 @@ def native_preflight(runner,env,event,out):
         return value
     start=time.monotonic();obs=actor_obs(env.get_observations());done_events=0;contact_peak=0.
     event('upright_native_preflight_begin',physics_steps=100,optimizer_updates=0,quality_acceptance=False)
-    with torch.inference_mode():
+    with torch.no_grad():
         for step in range(100):
             action=runner.alg.policy.actor(obs)
             assert action.shape==(4096,29) and torch.isfinite(action).all()

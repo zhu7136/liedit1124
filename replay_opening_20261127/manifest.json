@@ -1,0 +1,17 @@
+{
+  "source_task": "TASK_20261126_542",
+  "source_commit": "325e3ba397440e6e183b69391b8966f3710cd078",
+  "authorization_utc": "2026-11-27T00:59:39Z",
+  "total_gpu_budget_seconds": 300,
+  "entry_deadline_seconds": 240,
+  "child_deadline_seconds": 205,
+  "max_launch_requests": 1,
+  "training_updates": 0,
+  "automatic_retries": 0,
+  "policy_sha256": "8fe02e377239f879e59ff1c52a0b72ae07d082c6ed4f72ccde7de483d81f73a2",
+  "public_git_policy": false,
+  "entry_files": {
+    "launch.py": "e4e579082f211de279139c6c93169f0a0d099528e919fbcb6995a2dd630f59fe",
+    "replay_hooks.py": "8cdd37c99a5cb699a245b6c3358133079e676fd4b279676861b24fd56ac572b9"
+  }
+}

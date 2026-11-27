@@ -1,0 +1,16 @@
+{
+  "passed": 9,
+  "checks": [
+    "all source hashes and Python syntax",
+    "every model and package source byte matches supplied ZIP",
+    "complete pinned offline wheel set",
+    "NPZ shapes dtypes preserved and first334 frames exactly unchanged",
+    "static final950-frame hold velocities",
+    "fresh standard task and no historical resume/reward hooks",
+    "soft deadline saves nonempty checkpoint after completed update",
+    "nonfinite PPO metrics fail without declaring completion",
+    "unexpected checkpoint resume rejected"
+  ],
+  "gpu_simulation_tested": false,
+  "training_started": false
+}

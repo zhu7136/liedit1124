@@ -23,7 +23,7 @@ def worker(started):
     from offline_dependencies import prepare_dependencies
     from normal23000_checkpoint_http import ensure_checkpoint
     ensure_checkpoint();prepare_dependencies();os.chdir(ROOT)
-    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/kneel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','1000','--seed','42','--experiment_name','hud04_balanced_four_support_20261128','--run_name','TASK005_balanced_support_4096_max30min','--init_checkpoint',str(ROOT/'inputs/normal_model_23000.pt'),'--logger','tensorboard','--headless','--device','cuda:0']
+    sys.argv=[str(ROOT/'scripts/rsl_rl/train.py'),'--task','LimX-HU-D04-01-Flat-BeyondMimic-No-State-Estimation','--motion_file',str(ROOT/'motions/kneel_candidate/motion.npz'),'--num_envs','4096','--max_iterations','1000','--seed','42','--experiment_name','hud04_balanced_four_support_v2_20261128','--run_name','TASK005_equal25_devicefix_4096_max30min','--init_checkpoint',str(ROOT/'inputs/normal_model_23000.pt'),'--logger','tensorboard','--headless','--device','cuda:0']
     runpy.run_path(str(ROOT/'scripts/rsl_rl/train.py'),run_name='__main__')
 def archive_outputs(code,reason):
     record={'child_exit_code':code,'parent_stop_reason':reason,'worker_seconds':1800,'automatic_retries':0,'completion_present':(OUT/'completion.json').is_file(),'commit':os.environ['KNEEL_COMMIT'],'delivery_sha256':os.environ['KNEEL_DELIVERY_SHA256']}

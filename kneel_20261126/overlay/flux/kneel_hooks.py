@@ -23,7 +23,7 @@ def audit_environment(env):
     assert hashlib.sha256(Path(raw.cfg.commands.motion.motion_file).read_bytes()).hexdigest()==MOTION_SHA
     assert raw.cfg.scene.robot.spawn.articulation_props.enabled_self_collisions is False
     assert command.motion.joint_vel[434:].abs().max()<1e-6
-    assert set(['hold_force_balance','hold_four_support','hold_force_smooth','hold_motion','final_hold_action_rate_l2']).issubset(raw.reward_manager.active_terms)
+    assert set(['hold_force_balance','hold_four_support','hold_equal_load','hold_force_smooth','hold_motion','final_hold_action_rate_l2']).issubset(raw.reward_manager.active_terms)
     from balanced_support_rewards import measurements
     f,w,ids,torso=measurements(raw);assert f.shape==(4096,4) and torch.isfinite(w).all()
     assert (w>400).all() and (w<700).all()
@@ -83,7 +83,9 @@ def run_bounded_training(runner,iterations,env,log_dir):
               'motion_sha256':MOTION_SHA,'completed_updates':updates,'source_iteration':999,
               'actor_obs_dim':154,'critic_obs_dim':286,'actions':29,
               'code_commit':os.environ['KNEEL_COMMIT'],'yaml_origin':'actual same-run native export',
-              'preflight_passed':True,'no_mp4':True,'hardware_approved':False}
+              'preflight_passed':True,'no_mp4':True,'hardware_approved':False,
+              'trial_revision':'balanced-v2-device-fix-explicit-equal-load',
+              'parent_external_task':'TASK_20261128_005','equal_load_reward_weight':-4.0}
     payload['deployment_metadata']=metadata
     torch.save(payload,checkpoint)
     torch.save(metadata,OUT/'native_deploy_metadata.pt')

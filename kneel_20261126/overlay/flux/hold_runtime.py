@@ -15,13 +15,14 @@ def hold_action_rate_l2(env, command_name='motion', start_frame=HOLD_START_FRAME
 def configure_hold_trial(env_cfg,agent_cfg):
     from isaaclab.managers import RewardTermCfg,SceneEntityCfg
     from isaaclab.actuators import ImplicitActuatorCfg
-    from balanced_support_rewards import force_balance,four_support,force_smooth,hold_motion,hold_action_change
+    from balanced_support_rewards import force_balance,four_support,equal_load,force_smooth,hold_motion,hold_action_change
     env_cfg.episode_length_s=30.0
     env_cfg.scene.robot.spawn.usd_path=str(ROOT/"source/limx_rl_lab/data/Robots/limx/HU_D04_description/usd/HU_D04_01_BalancedContacts.usda")
     env_cfg.scene.robot.actuators['passive_knee_wheels']=ImplicitActuatorCfg(joint_names_expr=['left_knee_wheel_joint','right_knee_wheel_joint'],effort_limit_sim=0.0,velocity_limit_sim=1000.0,stiffness=0.0,damping=0.0,armature=0.0)
     env_cfg.scene.robot.init_state.joint_pos['.*_knee_wheel_joint']=0.0
     env_cfg.rewards.hold_force_balance=RewardTermCfg(func=force_balance,weight=-4.0)
     env_cfg.rewards.hold_four_support=RewardTermCfg(func=four_support,weight=2.0)
+    env_cfg.rewards.hold_equal_load=RewardTermCfg(func=equal_load,weight=-4.0)
     env_cfg.rewards.hold_force_smooth=RewardTermCfg(func=force_smooth,weight=-0.1)
     env_cfg.rewards.hold_motion=RewardTermCfg(func=hold_motion,weight=-0.5)
     env_cfg.rewards.final_hold_action_rate_l2=RewardTermCfg(func=hold_action_change,weight=-0.05)

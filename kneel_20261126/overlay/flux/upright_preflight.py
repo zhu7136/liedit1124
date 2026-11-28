@@ -5,7 +5,7 @@ import torch
 def native_preflight(runner,env,event,out):
     raw=env.unwrapped;robot=raw.scene['robot'];cmd=raw.command_manager.get_term('motion')
     names=list(robot.body_names)
-    assert 'zuolun_link' not in names and 'youlun_link' not in names, 'Unexpected MuJoCo-only knee wheels in native training asset'
+    assert 'zuolun_link' in names and 'youlun_link' in names, 'Expected actual knee wheel bodies in patched native asset'
     assert cmd.motion.joint_vel[434:].abs().max()<1e-6
     assert cmd.motion.joint_vel[335:434].abs().max()>1e-4
     assert cmd.motion._body_ang_vel_w[434:].abs().max()<1e-6
@@ -28,6 +28,6 @@ def native_preflight(runner,env,event,out):
             contact_peak=max(contact_peak,float(forces.norm(dim=-1).max().item()))
     assert len(runner.alg.optimizer.state)==0, 'Preflight must not optimize'
     env.reset()
-    result={'passed':True,'physics_steps':100,'simulated_seconds_per_environment':float(raw.step_dt*100),'num_envs':4096,'done_events':done_events,'peak_contact_force_N':contact_peak,'seconds':round(time.monotonic()-start,3),'native_knee_wheels_absent':True,'finite_state_and_contact_forces':True,'optimizer_updates':0,'quality_acceptance':False,'dynamics_stability_validated':False,'note':'Frozen baseline with normal training resets/randomization. Proves runtime compatibility only; it does not prove stable upright holding.'}
+    result={'passed':True,'physics_steps':100,'simulated_seconds_per_environment':float(raw.step_dt*100),'num_envs':4096,'done_events':done_events,'peak_contact_force_N':contact_peak,'seconds':round(time.monotonic()-start,3),'native_knee_wheels_present':True,'finite_state_and_contact_forces':True,'optimizer_updates':0,'quality_acceptance':False,'dynamics_stability_validated':False,'note':'Frozen baseline with normal training resets/randomization. Proves runtime compatibility only; it does not prove stable upright holding.'}
     (out/'native_preflight.json').write_text(json.dumps(result,indent=2))
     event('upright_native_preflight_passed',**result)

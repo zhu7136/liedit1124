@@ -1,8 +1,8 @@
 {
-  "authorized_utc": "2026-11-27T16:03:14Z",
-  "source_iteration": 23000,
-  "checkpoint_sha256": "e9bf8d19b21354f5993f335ad57fcc235c76ebb9aa9e27c7d6305b95b0ee94b5",
-  "motion_sha256": "95603a5949b63d978300c3e9c9d893ecd322909b11c6cffbc8b7418073378dca",
+  "authorized_utc": "2026-11-28T09:21:20Z",
+  "source_iteration": 999,
+  "checkpoint_sha256": "523e3555ae48112f9d0c5a66387c9a2b97f6b66512a41267873c934ee7fc26f1",
+  "motion_sha256": "bbb0a091d83d108b2a81c17a2ba20d20dc69ed92c88aa0fff0fdd6537a8e9a51",
   "original_normal_source_files": [
     "source/limx_rl_lab/limx_rl_lab/__init__.py",
     "source/limx_rl_lab/limx_rl_lab/tasks/__init__.py",
@@ -28,19 +28,19 @@
   "maximum_additional_ppo_updates": 1000,
   "new_gpu_jobs": 1,
   "automatic_retries": 0,
-  "episode_length_s": 10.0,
-  "changed_reward": null,
+  "episode_length_s": 30.0,
+  "changed_reward": "hold-only load balance + four positive supports + force smoothness + contact velocity + action change",
   "optimizer_reset": true,
-  "normalization": "identity, verified from source checkpoint",
+  "normalization": "same identity as TASK005",
   "original_kd_preserved": true,
   "hardware_approved": false,
   "extra_final_hold_action_rate_weight": 0.0,
   "final_hold_start_frame": 434,
   "transition_frames": [
-    334,
+    150,
     434
   ],
-  "hypothesis": "Changing only the consistent 42-body reference can teach upright hold while preserving the original opening motion.",
+  "hypothesis": "Matching knee-wheel contact geometry and symmetric feasible reference plus explicit hold load balance should eliminate single-knee support.",
   "native_preflight_steps": 100,
   "preflight_quality_acceptance": false,
   "render_mp4": false,
@@ -48,5 +48,9 @@
   "preflight_fix": "torch.no_grad for native simulation, not torch.inference_mode",
   "preflight_fix_cpu_regression_passed": true,
   "native_fix_verified": false,
-  "actual_deploy_yaml_embedded_in_final_checkpoint": true
+  "actual_deploy_yaml_embedded_in_final_checkpoint": true,
+  "parent_task_id": "TASK_20261128_005",
+  "hold_onset_sampling_fraction": 0.5,
+  "reference_clamped_at_end": true,
+  "randomization": "observation noise retained; first-stage pushes/COM/material asymmetry disabled"
 }

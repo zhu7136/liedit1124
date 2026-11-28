@@ -39,7 +39,7 @@ def restore(destination,expected_sha):
     for name,content in sorted(all_files.items()):
         path=destination/name;path.parent.mkdir(parents=True,exist_ok=True)
         with path.open('xb') as f:f.write(content)
-    event('source_delivery_verified',files=len(all_files),chunks=len(d['chunks']),archive_sha256=sha(payload),motion_sha256=d['motion_sha256'],fresh_training=False,source_iteration=23000,historical_entrypoints_included=False,worker_http_downloads=True,checkpoint_transport="private_WeTransfer_SHA256_verified_pre_GPU")
+    event('source_delivery_verified',files=len(all_files),chunks=len(d['chunks']),archive_sha256=sha(payload),motion_sha256=d['motion_sha256'],fresh_training=False,source_iteration=999,parent_task='TASK_20261128_005',historical_entrypoints_included=False,worker_http_downloads=True,checkpoint_transport="private_TASK005_OSS_SHA256_verified_pre_GPU")
     return d
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--expected-manifest-sha256',required=True);parser.add_argument('--expected-commit');parser.add_argument('--checkpoint-url');parser.add_argument('--work-dir',type=Path)

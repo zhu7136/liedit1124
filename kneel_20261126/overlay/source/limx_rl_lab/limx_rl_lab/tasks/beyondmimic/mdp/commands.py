@@ -87,7 +87,11 @@ class MotionCommand(CommandTerm):
             self.robot.find_bodies(self.cfg.body_names, preserve_order=True)[0], dtype=torch.long, device=self.device
         )
 
-        self.motion = MotionLoader(self.cfg.motion_file, self.body_indexes, device=self.device)
+        import json
+        from pathlib import Path
+        reference_order=json.loads((Path(__file__).resolve().parents[6]/'flux/motion_order.json').read_text())['body_mapping']
+        reference_ids=[reference_order[name] for name in self.cfg.body_names]
+        self.motion = MotionLoader(self.cfg.motion_file, reference_ids, device=self.device)
         motion_joint_count = self.motion.joint_pos.shape[1]
         motion_joint_vel_count = self.motion.joint_vel.shape[1]
         robot_joint_count = len(self.robot.data.joint_names)
@@ -273,6 +277,8 @@ class MotionCommand(CommandTerm):
         if len(env_ids) == 0:
             return
         self._adaptive_sampling(env_ids)
+        select=torch.rand(len(env_ids),device=self.device)<0.5
+        self.time_steps[torch.as_tensor(env_ids,device=self.device)[select]]=434
 
         root_pos = self.body_pos_w[:, 0].clone()
         root_ori = self.body_quat_w[:, 0].clone()
@@ -316,9 +322,7 @@ class MotionCommand(CommandTerm):
         )
 
     def _update_command(self):
-        self.time_steps += 1
-        env_ids = torch.where(self.time_steps >= self.motion.time_step_total)[0]
-        self._resample_command(env_ids)
+        self.time_steps = torch.clamp(self.time_steps+1,max=self.motion.time_step_total-1)
 
         anchor_pos_w_repeat = self.anchor_pos_w[:, None, :].repeat(1, len(self.cfg.body_names), 1)
         anchor_quat_w_repeat = self.anchor_quat_w[:, None, :].repeat(1, len(self.cfg.body_names), 1)

@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 ROOT=Path(__file__).resolve().parents[1]
 HOLD_START_FRAME=434
-SOURCE_ITERATION=23000
+SOURCE_ITERATION=999
 
 def hold_action_rate_l2(env, command_name='motion', start_frame=HOLD_START_FRAME):
     command=env.command_manager.get_term(command_name)
@@ -13,15 +13,25 @@ def hold_action_rate_l2(env, command_name='motion', start_frame=HOLD_START_FRAME
     return gate.to(penalty.dtype)*penalty
 
 def configure_hold_trial(env_cfg,agent_cfg):
-    from isaaclab.managers import RewardTermCfg
-    assert env_cfg.episode_length_s==10.0
-    assert env_cfg.rewards.action_rate_l2.weight==-0.1
-    # Reference-only first trial: preserve original rewards, no extra hold penalty.
-    assert not hasattr(env_cfg.rewards, 'final_hold_action_rate_l2')
-    # The source checkpoint has no normalization buffers. Explicit False keeps
-    # the same identity normalization; never create uninitialized normalizers.
-    agent_cfg.policy.actor_obs_normalization=False
-    agent_cfg.policy.critic_obs_normalization=False
+    from isaaclab.managers import RewardTermCfg,SceneEntityCfg
+    from isaaclab.actuators import ImplicitActuatorCfg
+    from balanced_support_rewards import force_balance,four_support,force_smooth,hold_motion,hold_action_change
+    env_cfg.episode_length_s=30.0
+    env_cfg.scene.robot.spawn.usd_path=str(ROOT/"source/limx_rl_lab/data/Robots/limx/HU_D04_description/usd/HU_D04_01_BalancedContacts.usda")
+    env_cfg.scene.robot.actuators['passive_knee_wheels']=ImplicitActuatorCfg(joint_names_expr=['left_knee_wheel_joint','right_knee_wheel_joint'],effort_limit_sim=0.0,velocity_limit_sim=1000.0,stiffness=0.0,damping=0.0,armature=0.0)
+    env_cfg.scene.robot.init_state.joint_pos['.*_knee_wheel_joint']=0.0
+    env_cfg.rewards.hold_force_balance=RewardTermCfg(func=force_balance,weight=-4.0)
+    env_cfg.rewards.hold_four_support=RewardTermCfg(func=four_support,weight=2.0)
+    env_cfg.rewards.hold_force_smooth=RewardTermCfg(func=force_smooth,weight=-0.1)
+    env_cfg.rewards.hold_motion=RewardTermCfg(func=hold_motion,weight=-0.5)
+    env_cfg.rewards.final_hold_action_rate_l2=RewardTermCfg(func=hold_action_change,weight=-0.05)
+    env_cfg.rewards.undesired_contacts.params['sensor_cfg']=SceneEntityCfg('contact_forces',body_names=[r'^(?!left_ankle_roll_link$)(?!right_ankle_roll_link$)(?!zuolun_link$)(?!youlun_link$)(?!left_wrist_roll_link$)(?!right_wrist_roll_link$)(?!left_hand_contact$)(?!right_hand_contact$).+$'])
+    # First establish support under paired contact properties; retain observation noise,
+    # disable random pushes and COM/material asymmetry for this first feasibility trial.
+    env_cfg.events.physics_material=None;env_cfg.events.base_com=None;env_cfg.events.push_robot=None
+    env_cfg.commands.motion.pose_range={};env_cfg.commands.motion.velocity_range={};env_cfg.commands.motion.joint_position_range=(0.0,0.0)
+    agent_cfg.policy.actor_obs_normalization=False;agent_cfg.policy.critic_obs_normalization=False
+    agent_cfg.algorithm.learning_rate=0.0001
     agent_cfg.save_interval=100
 
 def strict_warm_start(runner,checkpoint_path):
